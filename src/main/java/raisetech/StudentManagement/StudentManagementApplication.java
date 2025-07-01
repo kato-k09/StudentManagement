@@ -1,8 +1,7 @@
 package raisetech.StudentManagement;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,6 +28,21 @@ public class StudentManagementApplication {
 		Student student = repository.searchByName(name);
 		return student.getName() + " " + student.getAge() + "歳";
 	}
+
+	////////////////////////////////////////////////////
+	//20_JDBCとMyBatis 課題　学生の全データを取得し表示する
+	////////////////////////////////////////////////////
+	@GetMapping("/studentList")
+	public String showStudent() {
+		List<Student> studentList = repository.showStudent();
+		if (studentList.isEmpty()) {
+			return "登録されている学生はいません";
+		}
+		return studentList.stream()
+				.map(v -> v.getName() + " " + v.getAge() + "歳")
+				.collect(Collectors.joining("\n"));
+	}
+	////////////////////////////////////////////////////
 
 	@PostMapping("/student")
 	public void registerStudent(String name, int age) {
