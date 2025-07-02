@@ -5,10 +5,10 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -16,44 +16,53 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class StudentManagementApplication {
 
-	@Autowired
-	private StudentRepository repository;
+  @Autowired
+  private StudentsRepository studentsRepository;
+  @Autowired
+  private CoursesRepository coursesRepository;
 
-	public static void main(String[] args) {
-		SpringApplication.run(StudentManagementApplication.class, args);
-	}
+  public static void main(String[] args) {
+    SpringApplication.run(StudentManagementApplication.class, args);
+  }
 
-	@GetMapping("/student")
-	public String getStudent(@RequestParam String name) {
-		Student student = repository.searchByName(name);
-		return student.getName() + " " + student.getAge() + "歳";
-	}
+  // 21_実際に構築するWebアプリの解説とテーブル設計
 
-	//20_JDBCとMyBatis 課題　学生の全データを取得し表示する
-	@GetMapping("/studentList")
-	public String showStudent() {
-		List<Student> studentList = repository.showStudent();
-		if (studentList.isEmpty()) {
-			return "登録されている学生はいません";
-		}
-		return studentList.stream()
-				.map(v -> v.getName() + " " + v.getAge() + "歳")
-				.collect(Collectors.joining("\n"));
-	}
+  // 登録
+  @PostMapping("/studentManage")
+  public void registerStudent(String id, String fullName, String furigana, String nickName,
+      String mail, String region, int age, String gender, String course, java.sql.Date startDate,
+      java.sql.Date scheduledEndDate) {
 
-	@PostMapping("/student")
-	public void registerStudent(String name, int age) {
-		repository.registerStudent(name, age);
-	}
+    if (!studentsRepository.isStudent(id)) {
+      studentsRepository.registerStudent(id, fullName, furigana, nickName, mail, region, age,
+          gender);
+    }
+    if (!coursesRepository.isCourse(id, course)) {
+      coursesRepository.registerCourse(id, course, startDate, scheduledEndDate);
+    }
+  }
 
-	@PatchMapping("/student")
-	public void updateStudent(String name, int age) {
-		repository.updateStudent(name, age);
-	}
+  // 検索
+  @GetMapping("/studentManage")
+  public String searchStudent(@RequestParam String fullName) {
+    Student showStudent = studentsRepository.searchStudent(fullName);
+    List<Course> showCourses = coursesRepository.searchCourse(showStudent.getId());
+    return "受講生情報\nID: " + showStudent.getId() + " 名前: " + showStudent.getFullName()
+        + " フリガナ: "
+        + showStudent.getFurigana() + " ニックネーム: " + showStudent.getNickName() + " メール: "
+        + showStudent.getMail() + " 居住地: " + showStudent.getRegion() + " 年齢: "
+        + showStudent.getAge() + " 性別: " + showStudent.getGender() + "\n"
+        + showCourses.stream()
+        .map(v -> "コース: " + v.getCourse() + " 受講開始日: " + v.getStartDate() + " 受講終了予定日: "
+            + v.getScheduledEndDate())
+        .collect(Collectors.joining("\n"));
+  }
 
-	@DeleteMapping("/student")
-	public void deleteStudent(String name) {
-		repository.deleteStudent(name);
-	}
+  // 更新
+  @PatchMapping("/studentManage")
+  public void updateStudent(@RequestBody StudentManageUpdateRequest request) {
+    studentsRepository.updateStudent(request.getStudent());
+    coursesRepository.updateCourse(request.getCourse());
+  }
 
 }

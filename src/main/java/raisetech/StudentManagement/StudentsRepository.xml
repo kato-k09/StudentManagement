@@ -1,0 +1,17 @@
+<mapper namespace="raisetech.StudentManagement.StudentsRepository">
+
+  <update id="updateStudent" parameterType="Student">
+    UPDATE students
+    <set>
+      <if test="fullName != null">fullName = #{fullName},</if>
+      <if test="furigana != null">furigana = #{furigana},</if>
+      <if test="nickName != null">nickName = #{nickName},</if>
+      <if test="mail != null">mail = #{mail},</if>
+      <if test="region != null">region = #{region},</if>
+      <if test="age != null">age = #{age},</if>
+      <if test="gender != null">gender = #{gender},</if>
+    </set>
+    WHERE id = #{id}
+  </update>
+
+</mapper>
