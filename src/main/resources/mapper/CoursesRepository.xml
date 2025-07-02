@@ -7,12 +7,10 @@
   <update id="updateCourse" parameterType="Course">
     UPDATE students_courses
     <set>
-      <if test="course != null">course = #{course},</if>
       <if test="startDate != null">startDate = #{startDate},</if>
       <if test="scheduledEndDate != null">scheduledEndDate = #{scheduledEndDate},</if>
     </set>
-    WHERE id = #{id}
-    <if test="course != null">AND course = #{course}</if>
+    WHERE id = #{id} AND course = #{course}
   </update>
 
 </mapper>

@@ -27,26 +27,43 @@ public class StudentManagementApplication {
 
   // 21_実際に構築するWebアプリの解説とテーブル設計
 
-  // 登録
+  // 受講生情報登録
   @PostMapping("/studentManage")
   public void registerStudent(String id, String fullName, String furigana, String nickName,
-      String mail, String region, int age, String gender, String course, java.sql.Date startDate,
-      java.sql.Date scheduledEndDate) {
+      String mail, String region, int age, String gender) {
+
+    if (id == null) {
+      return; // パラメータにidが無ければ終了
+    }
 
     if (!studentsRepository.isStudent(id)) {
       studentsRepository.registerStudent(id, fullName, furigana, nickName, mail, region, age,
-          gender);
+          gender); // 登録済みでないIDのときのみ登録する
     }
+  }
+
+  // コース情報登録
+  @PostMapping("/courseManage")
+  public void registerCourse(String id, String course, java.sql.Date startDate,
+      java.sql.Date scheduledEndDate) {
+
+    if (id == null || course == null) {
+      return; // パラメータにid or courseが無ければ終了
+    }
+
     if (!coursesRepository.isCourse(id, course)) {
       coursesRepository.registerCourse(id, course, startDate, scheduledEndDate);
-    }
+    } // 登録済みでないID、コースのときのみ登録する
   }
 
   // 検索
   @GetMapping("/studentManage")
   public String searchStudent(@RequestParam String fullName) {
-    Student showStudent = studentsRepository.searchStudent(fullName);
-    List<Course> showCourses = coursesRepository.searchCourse(showStudent.getId());
+
+    Student showStudent = studentsRepository.searchStudent(fullName); // フルネームから受講生情報を取得
+    List<Course> showCourses = coursesRepository.searchCourse(
+        showStudent.getId()); // 紐づけられたIDのコース情報を取得
+
     return "受講生情報\nID: " + showStudent.getId() + " 名前: " + showStudent.getFullName()
         + " フリガナ: "
         + showStudent.getFurigana() + " ニックネーム: " + showStudent.getNickName() + " メール: "
@@ -55,10 +72,10 @@ public class StudentManagementApplication {
         + showCourses.stream()
         .map(v -> "コース: " + v.getCourse() + " 受講開始日: " + v.getStartDate() + " 受講終了予定日: "
             + v.getScheduledEndDate())
-        .collect(Collectors.joining("\n"));
+        .collect(Collectors.joining("\n")); // 受講生、コース情報を出力
   }
 
-  // 更新
+  // 受講生情報更新
   @PatchMapping("/studentManage")
   public void updateStudent(
       @RequestParam(required = false) String id,
@@ -68,17 +85,15 @@ public class StudentManagementApplication {
       @RequestParam(required = false) String mail,
       @RequestParam(required = false) String region,
       @RequestParam(required = false) Integer age,
-      @RequestParam(required = false) String gender,
-      @RequestParam(required = false) String course,
-      @RequestParam(required = false) java.sql.Date startDate,
-      @RequestParam(required = false) java.sql.Date scheduledEndDate) {
-    Student updateStudent = new Student();
-
-    updateStudent.setId(id);
+      @RequestParam(required = false) String gender) {
 
     if (id == null) {
-      return;
+      return; // パラメータにidが無ければ終了
     }
+
+    Student updateStudent = new Student();
+    updateStudent.setId(id);
+
     if (fullName != null) {
       updateStudent.setFullName(fullName);
     }
@@ -101,11 +116,26 @@ public class StudentManagementApplication {
       updateStudent.setGender(gender);
     }
 
+    studentsRepository.updateStudent(updateStudent);
+
+  }
+
+  // コース情報更新
+  @PatchMapping("/courseManage")
+  public void updateCourse(
+      @RequestParam(required = false) String id,
+      @RequestParam(required = false) String course,
+      @RequestParam(required = false) java.sql.Date startDate,
+      @RequestParam(required = false) java.sql.Date scheduledEndDate) {
+
+    if (id == null || course == null) {
+      return; // パラメータにid or courseが無ければ終了
+    }
+
     Course updateCourse = new Course();
     updateCourse.setId(id);
-    if (course != null) {
-      updateCourse.setCourse(course);
-    }
+    updateCourse.setCourse(course);
+
     if (startDate != null) {
       updateCourse.setStartDate(startDate);
     }
@@ -113,18 +143,27 @@ public class StudentManagementApplication {
       updateCourse.setScheduledEndDate(scheduledEndDate);
     }
 
-    studentsRepository.updateStudent(updateStudent);
-    if (course == null) {
-      return;
-    }
     coursesRepository.updateCourse(updateCourse);
-
   }
 
-  // 削除
+  // 学生情報削除
   @DeleteMapping("/studentManage")
   public void deleteStudent(String id) {
+
+    if (id == null) {
+      return; // パラメータにidが無ければ終了
+    }
     studentsRepository.deleteStudent(id);
-    coursesRepository.deleteCourse(id);
+    coursesRepository.deleteAllCourse(id);
+  }
+
+  // コース情報削除
+  @DeleteMapping("/courseManage")
+  public void deleteCourse(String id, String course) {
+
+    if (id == null || course == null) {
+      return; // パラメータにid or courseが無ければ終了
+    }
+    coursesRepository.deleteCourse(id, course);
   }
 }

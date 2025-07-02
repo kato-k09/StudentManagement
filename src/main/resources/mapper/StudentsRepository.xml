@@ -7,7 +7,6 @@
   <update id="updateStudent" parameterType="Student">
     UPDATE students
     <set>
-      <if test="id != null">id = #{id},</if>
       <if test="fullName != null">fullName = #{fullName},</if>
       <if test="furigana != null">furigana = #{furigana},</if>
       <if test="nickName != null">nickName = #{nickName},</if>

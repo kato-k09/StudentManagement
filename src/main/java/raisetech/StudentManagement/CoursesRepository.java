@@ -25,7 +25,11 @@ public interface CoursesRepository {
   // 更新
   void updateCourse(Course course);
 
-  // 削除
+  // 全て削除
   @Delete("DELETE FROM students_courses WHERE id = #{id}")
-  void deleteCourse(String id);
+  void deleteAllCourse(String id);
+
+  // 指定削除
+  @Delete("DELETE FROM students_courses WHERE id = #{id} AND course = #{course}")
+  void deleteCourse(String id, String course);
 }
