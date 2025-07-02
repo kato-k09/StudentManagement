@@ -29,9 +29,7 @@ public class StudentManagementApplication {
 		return student.getName() + " " + student.getAge() + "歳";
 	}
 
-	////////////////////////////////////////////////////
 	//20_JDBCとMyBatis 課題　学生の全データを取得し表示する
-	////////////////////////////////////////////////////
 	@GetMapping("/studentList")
 	public String showStudent() {
 		List<Student> studentList = repository.showStudent();
@@ -42,7 +40,6 @@ public class StudentManagementApplication {
 				.map(v -> v.getName() + " " + v.getAge() + "歳")
 				.collect(Collectors.joining("\n"));
 	}
-	////////////////////////////////////////////////////
 
 	@PostMapping("/student")
 	public void registerStudent(String name, int age) {
