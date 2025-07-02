@@ -1,3 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
 <mapper namespace="raisetech.StudentManagement.CoursesRepository">
 
   <update id="updateCourse" parameterType="Course">
@@ -7,7 +11,8 @@
       <if test="startDate != null">startDate = #{startDate},</if>
       <if test="scheduledEndDate != null">scheduledEndDate = #{scheduledEndDate},</if>
     </set>
-    WHERE id = #{id} AND course = #{course}
+    WHERE id = #{id}
+    <if test="course != null">AND course = #{course}</if>
   </update>
 
 </mapper>
