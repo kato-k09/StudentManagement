@@ -33,7 +33,12 @@ public class StudentController {
   }
 
   @GetMapping("/studentsCourseList")
-  public List<StudentsCourses> getStudentsCourseList() {
-    return service.searchStudentsCourseList();
+  public String getStudentsCourseList(Model model) {
+
+    List<StudentsCourses> studentsCourses = service.searchStudentsCourseList();
+
+    model.addAttribute("studentsCoursesList",
+        studentsCourses);
+    return "studentsCoursesList";
   }
 }
