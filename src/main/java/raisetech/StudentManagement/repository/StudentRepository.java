@@ -1,6 +1,8 @@
 package raisetech.StudentManagement.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 import raisetech.StudentManagement.data.Student;
@@ -24,4 +26,26 @@ public interface StudentRepository {
 
   @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCourses();
+
+  /**
+   * 受講生情報を登録します。
+   */
+  @Insert("INSERT INTO students VALUES(#{id}, #{name}, #{kanaName}, #{nickname}, #{email}, #{area}, #{age}, #{sex}, #{remark}, #{isDeleted})")
+  void insertStudent(String id, String name, String kanaName, String nickname, String email,
+      String area, int age, String sex, String remark, boolean isDeleted);
+
+  /**
+   * コース情報を登録します。
+   */
+  @Insert("INSERT INTO students_courses VALUES(#{id}, #{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt}, #{isDeleted})")
+  void insertCourse(String id, String studentId, String courseName, LocalDateTime courseStartAt,
+      LocalDateTime courseEndAt, boolean isDeleted);
+
+  /**
+   * 個人コース情報を検索します。
+   */
+  @Select("SELECT * FROM students_courses WHERE student_Id = #{studentId}")
+  List<StudentsCourses> searchIndividualStudentCourses(String studentId);
+
+
 }
