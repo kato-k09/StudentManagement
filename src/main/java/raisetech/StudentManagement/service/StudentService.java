@@ -61,5 +61,9 @@ public class StudentService {
     );
   }
 
+  public List<StudentsCourses> searchIndividualStudentCoursesService(String studentId) {
+    return repository.searchIndividualStudentCourses(studentId);
+  }
+
 
 }
