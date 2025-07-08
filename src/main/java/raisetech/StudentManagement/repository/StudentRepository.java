@@ -22,16 +22,16 @@ public interface StudentRepository {
    *
    * @return 全件検索した受講生情報の一覧
    */
-  @Select("SELECT * FROM students")
+  @Select("SELECT * FROM students WHERE is_deleted = false")
   List<Student> search();
 
-  @Select("SELECT * FROM students WHERE id = #{id}")
+  @Select("SELECT * FROM students WHERE id = #{id} AND is_deleted = false")
   Student searchStudent(String id);
 
-  @Select("SELECT * FROM students_courses")
+  @Select("SELECT * FROM students_courses WHERE is_deleted = false")
   List<StudentsCourses> searchStudentsCoursesList();
 
-  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
+  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId} AND is_deleted = false")
   List<StudentsCourses> searchStudentsCourse(String studentId);
 
   /**
@@ -53,18 +53,6 @@ public interface StudentRepository {
   void registerStudentsCourses(StudentsCourses studentsCourses);
 
   /**
-   * 個人受講生情報を検索します。
-   */
-  @Select("SELECT * FROM students WHERE id = #{id}")
-  Student searchIndividualStudent(String id);
-
-  /**
-   * 個人コース情報を検索します。
-   */
-  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
-  List<StudentsCourses> searchIndividualStudentCourses(String studentId);
-
-  /**
    * 個人受講生情報を更新します。
    */
   @Update("UPDATE students SET name=#{name}, kana_name=#{kanaName}, nickname=#{nickname}, "
@@ -74,7 +62,7 @@ public interface StudentRepository {
   /**
    * 個人コース情報を更新します。
    */
-  @Update("UPDATE students_courses SET course_name=#{courseName} WHERE id=#{id}")
+  @Update("UPDATE students_courses SET course_name=#{courseName}, is_deleted=#{isDeleted} WHERE id=#{id}")
   void updateStudentsCourses(StudentsCourses studentsCourses);
 
 }

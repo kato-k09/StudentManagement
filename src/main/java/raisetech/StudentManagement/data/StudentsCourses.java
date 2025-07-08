@@ -12,13 +12,18 @@ public class StudentsCourses {
   private String id;
   private String studentId;
   private String courseName;
-
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime courseStartAt;
-
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime courseEndAt;
-
   private boolean isDeleted;
 
+  public boolean getIsDeleted() {
+    return isDeleted;
+  }
+
+  public void setIsDeleted(boolean isDeleted) {
+    this.isDeleted = isDeleted;
+  }
+  
 }

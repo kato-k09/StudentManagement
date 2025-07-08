@@ -68,10 +68,6 @@ public class StudentController {
     return "redirect:/studentList";
   }
 
-  // 29課題　更新処理
-  // 個人受講生情報の更新入力フォームを表示
-
-
   // ブラウザから更新ボタンを押したときに実行
   // フォームの入力をstudentDetailとして取得しサービス層に渡す
   @PostMapping("/updateStudent")

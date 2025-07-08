@@ -52,15 +52,10 @@ public class StudentService {
     }
   }
 
-  // 29課題　更新処理
-  // パラメーターから受け取ったidを元に該当idの受講生情報を取得
-  public Student searchIndividualStudent(String id) {
-    return repository.searchIndividualStudent(id);
-  }
-
+  // 課題外実装　課題28の時作成、以後リファクタリング実施。
   // パラメーターから受け取ったidを元に該当studentIdのコース情報を取得
   public List<StudentsCourses> searchIndividualStudentCourses(String studentId) {
-    return repository.searchIndividualStudentCourses(studentId);
+    return repository.searchStudentsCourse(studentId);
   }
 
   // 受講生、コースでそれぞれ更新をする
@@ -68,8 +63,10 @@ public class StudentService {
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
 
-    // コース名のみを変更する機能も実装
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
+      if (studentDetail.getStudent().getIsDeleted()) {
+        studentsCourses.setIsDeleted(true);
+      }
       repository.updateStudentsCourses(studentsCourses);
     }
   }
