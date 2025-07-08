@@ -62,9 +62,7 @@ public class StudentController {
       return "error"; // エラーがあったらエラー画面表示
     }
 
-    // 28課題　新規受講生情報を登録する処理を実装する。
-    // 28課題　コース情報も一緒に登録できるように実装する。コースは単体で良い。
-    service.registerStudent(studentDetail); // studentDetailにフォームに入力した情報が入り、それをサービスに繋ぐ。
+    service.registerStudent(studentDetail);
 
     return "redirect:/studentList";
   }

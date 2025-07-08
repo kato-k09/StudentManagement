@@ -1,9 +1,9 @@
 package raisetech.StudentManagement.service;
 
 import java.util.List;
-import java.util.UUID;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -29,36 +29,12 @@ public class StudentService {
     return repository.searchStudentsCourses();
   }
 
+  @Transactional
   public void registerStudent(StudentDetail studentDetail) {
 
-    String studentUuid = UUID.randomUUID().toString();
-    studentDetail.getStudent().setId(studentUuid);
-    studentDetail.getStudentsCourses().get(0).setStudentId(studentUuid); // コースにも受講生IDをセット
+    repository.registerStudent(studentDetail.getStudent());
+    // TODO:コース情報登録も行う。
 
-    repository.insertStudent(
-        studentDetail.getStudent().getId(),
-        studentDetail.getStudent().getName(),
-        studentDetail.getStudent().getKanaName(),
-        studentDetail.getStudent().getNickname(),
-        studentDetail.getStudent().getEmail(),
-        studentDetail.getStudent().getArea(),
-        studentDetail.getStudent().getAge(),
-        studentDetail.getStudent().getSex(),
-        studentDetail.getStudent().getRemark(),
-        studentDetail.getStudent().isDeleted()
-    );
-
-    String courseUuid = UUID.randomUUID().toString();
-    studentDetail.getStudentsCourses().get(0).setId(courseUuid); // コースごとのUUIDを設定
-
-    repository.insertCourse(
-        studentDetail.getStudentsCourses().get(0).getId(),
-        studentDetail.getStudentsCourses().get(0).getStudentId(),
-        studentDetail.getStudentsCourses().get(0).getCourseName(),
-        studentDetail.getStudentsCourses().get(0).getCourseStartAt(),
-        studentDetail.getStudentsCourses().get(0).getCourseEndAt(),
-        studentDetail.getStudentsCourses().get(0).isDeleted()
-    );
   }
 
   public List<StudentsCourses> searchIndividualStudentCoursesService(String studentId) {

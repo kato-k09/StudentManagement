@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentsCourses;
@@ -30,9 +31,12 @@ public interface StudentRepository {
   /**
    * 受講生情報を登録します。
    */
-  @Insert("INSERT INTO students VALUES(#{id}, #{name}, #{kanaName}, #{nickname}, #{email}, #{area}, #{age}, #{sex}, #{remark}, #{isDeleted})")
-  void insertStudent(String id, String name, String kanaName, String nickname, String email,
-      String area, int age, String sex, String remark, boolean isDeleted);
+  @Insert(
+      "INSERT INTO students(name, kana_name, nickname, email, area, age, sex, remark, is_deleted)"
+          + " VALUES(#{name}, #{kanaName}, #{nickname}, #{email}, #{area}, #{age}, #{sex}, #{remark}, false)")
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  void registerStudent(Student student);
+
 
   /**
    * コース情報を登録します。
