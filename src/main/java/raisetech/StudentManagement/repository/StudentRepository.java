@@ -1,6 +1,5 @@
 package raisetech.StudentManagement.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
@@ -37,19 +36,19 @@ public interface StudentRepository {
   @Options(useGeneratedKeys = true, keyProperty = "id")
   void registerStudent(Student student);
 
-
   /**
    * コース情報を登録します。
    */
-  @Insert("INSERT INTO students_courses VALUES(#{id}, #{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt}, #{isDeleted})")
-  void insertCourse(String id, String studentId, String courseName, LocalDateTime courseStartAt,
-      LocalDateTime courseEndAt, boolean isDeleted);
+  @Insert(
+      "INSERT INTO students_courses(student_id, course_name, course_start_at, course_end_at, is_deleted)"
+          + "VALUES(#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt}, false)")
+  @Options(useGeneratedKeys = true, keyProperty = "id")
+  void registerStudentsCourses(StudentsCourses studentsCourses);
 
   /**
    * 個人コース情報を検索します。
    */
   @Select("SELECT * FROM students_courses WHERE student_Id = #{studentId}")
   List<StudentsCourses> searchIndividualStudentCourses(String studentId);
-
 
 }
