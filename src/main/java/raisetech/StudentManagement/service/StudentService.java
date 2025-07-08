@@ -43,8 +43,26 @@ public class StudentService {
     }
   }
 
-  public List<StudentsCourses> searchIndividualStudentCoursesService(String studentId) {
+  // 29課題　更新処理
+  // パラメーターから受け取ったidを元に該当idの受講生情報を取得
+  public Student searchIndividualStudent(int id) {
+    return repository.searchIndividualStudent(id);
+  }
+
+  // パラメーターから受け取ったidを元に該当studentIdのコース情報を取得
+  public List<StudentsCourses> searchIndividualStudentCourses(int studentId) {
     return repository.searchIndividualStudentCourses(studentId);
+  }
+
+  // 受講生、コースでそれぞれ更新をする
+  @Transactional
+  public void updateStudent(StudentDetail studentDetail) {
+    repository.updateStudent(studentDetail.getStudent());
+
+    // コース名のみを変更する機能も実装
+    for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
+      repository.updateCourse(studentsCourses);
+    }
   }
 
 }

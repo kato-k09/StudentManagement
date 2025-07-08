@@ -70,12 +70,44 @@ public class StudentController {
     return "redirect:/studentList";
   }
 
-  // studentList内のUUIDクリックでUUIDに紐づいた受講生コース情報を表示
+  // 29課題　更新処理
+  // 個人受講生情報の更新入力フォームを表示
+  @GetMapping("/individualStudent")
+  public String individualStudent(@RequestParam int id, Model model) {
+
+    Student individualStudent = service.searchIndividualStudent(
+        id); // パラメーターから受け取ったidに紐づいた受講生情報を取得
+    List<StudentsCourses> individualStudentCourses = service.searchIndividualStudentCourses(
+        id); // パラメーターから受け取ったid(studentId)に紐づいたコース情報を取得
+
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(individualStudent);
+    studentDetail.setStudentsCourses(individualStudentCourses);
+
+    model.addAttribute("studentDetail", studentDetail);
+    return "updateStudent";
+  }
+
+  // ブラウザから更新ボタンを押したときに実行
+  // フォームの入力をstudentDetailとして取得しサービス層に渡す
+  @PostMapping("/updateStudent")
+  public String updateStudent(@ModelAttribute StudentDetail studentDetail,
+      BindingResult result) {
+    if (result.hasErrors()) {
+      return "error"; // エラーがあったらエラー画面表示
+    }
+
+    service.updateStudent(studentDetail);
+
+    return "redirect:/studentList";
+  }
+
+  // 課題外実装　課題28の時作成、以後リファクタリング実施。
   @GetMapping("/individualStudentCourses")
-  public String showStudentCourse(@RequestParam String studentId, Model model) {
+  public String showStudentCourse(@RequestParam int studentId, Model model) {
 
     // studentIdに紐づいたコース情報のみをstudentCoursesに入れる
-    List<StudentsCourses> studentCourses = service.searchIndividualStudentCoursesService(studentId);
+    List<StudentsCourses> studentCourses = service.searchIndividualStudentCourses(studentId);
 
     // 個人のコース情報のみを表示するHTMLを表示する
     model.addAttribute("individualStudentCourses", studentCourses);

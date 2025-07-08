@@ -9,8 +9,8 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Setter
 public class StudentsCourses {
 
-  private String id;
-  private String studentId;
+  private int id;
+  private int studentId;
   private String courseName;
 
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
