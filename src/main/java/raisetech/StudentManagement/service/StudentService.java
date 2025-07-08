@@ -25,9 +25,18 @@ public class StudentService {
     return repository.search();
   }
 
+  public StudentDetail searchStudent(String id) {
+    Student student = repository.searchStudent(id);
+    List<StudentsCourses> studentsCourses = repository.searchStudentsCourse(student.getId());
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(student);
+    studentDetail.setStudentsCourses(studentsCourses);
+    return studentDetail;
+  }
+
   public List<StudentsCourses> searchStudentsCourseList() {
 
-    return repository.searchStudentsCourses();
+    return repository.searchStudentsCoursesList();
   }
 
   @Transactional
@@ -45,12 +54,12 @@ public class StudentService {
 
   // 29課題　更新処理
   // パラメーターから受け取ったidを元に該当idの受講生情報を取得
-  public Student searchIndividualStudent(int id) {
+  public Student searchIndividualStudent(String id) {
     return repository.searchIndividualStudent(id);
   }
 
   // パラメーターから受け取ったidを元に該当studentIdのコース情報を取得
-  public List<StudentsCourses> searchIndividualStudentCourses(int studentId) {
+  public List<StudentsCourses> searchIndividualStudentCourses(String studentId) {
     return repository.searchIndividualStudentCourses(studentId);
   }
 
@@ -61,7 +70,7 @@ public class StudentService {
 
     // コース名のみを変更する機能も実装
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
-      repository.updateCourse(studentsCourses);
+      repository.updateStudentsCourses(studentsCourses);
     }
   }
 
