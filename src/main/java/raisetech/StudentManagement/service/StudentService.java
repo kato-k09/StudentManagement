@@ -64,8 +64,8 @@ public class StudentService {
     repository.updateStudent(studentDetail.getStudent());
 
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
-      if (studentDetail.getStudent().getIsDeleted()) {
-        studentsCourses.setIsDeleted(true);
+      if (studentDetail.getStudent().isDeleted()) {
+        studentsCourses.setDeleted(true);
       }
       repository.updateStudentsCourses(studentsCourses);
     }

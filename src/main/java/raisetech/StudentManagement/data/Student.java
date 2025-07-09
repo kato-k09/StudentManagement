@@ -18,12 +18,4 @@ public class Student {
   private String remark;
   private boolean isDeleted;
 
-  public boolean getIsDeleted() {
-    return isDeleted;
-  }
-
-  public void setIsDeleted(boolean isDeleted) {
-    this.isDeleted = isDeleted;
-  }
-
 }

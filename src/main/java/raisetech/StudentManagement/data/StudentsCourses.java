@@ -18,12 +18,4 @@ public class StudentsCourses {
   private LocalDateTime courseEndAt;
   private boolean isDeleted;
 
-  public boolean getIsDeleted() {
-    return isDeleted;
-  }
-
-  public void setIsDeleted(boolean isDeleted) {
-    this.isDeleted = isDeleted;
-  }
-  
 }

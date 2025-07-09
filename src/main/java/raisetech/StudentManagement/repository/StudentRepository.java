@@ -22,16 +22,16 @@ public interface StudentRepository {
    *
    * @return 全件検索した受講生情報の一覧
    */
-  @Select("SELECT * FROM students WHERE is_deleted = false")
+  @Select("SELECT * FROM students")
   List<Student> search();
 
-  @Select("SELECT * FROM students WHERE id = #{id} AND is_deleted = false")
+  @Select("SELECT * FROM students WHERE id = #{id}")
   Student searchStudent(String id);
 
-  @Select("SELECT * FROM students_courses WHERE is_deleted = false")
+  @Select("SELECT * FROM students_courses")
   List<StudentsCourses> searchStudentsCoursesList();
 
-  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId} AND is_deleted = false")
+  @Select("SELECT * FROM students_courses WHERE student_id = #{studentId}")
   List<StudentsCourses> searchStudentsCourse(String studentId);
 
   /**
