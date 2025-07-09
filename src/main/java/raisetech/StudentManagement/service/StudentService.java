@@ -25,9 +25,18 @@ public class StudentService {
     return repository.search();
   }
 
+  public StudentDetail searchStudent(String id) {
+    Student student = repository.searchStudent(id);
+    List<StudentsCourses> studentsCourses = repository.searchStudentsCourse(student.getId());
+    StudentDetail studentDetail = new StudentDetail();
+    studentDetail.setStudent(student);
+    studentDetail.setStudentsCourses(studentsCourses);
+    return studentDetail;
+  }
+
   public List<StudentsCourses> searchStudentsCourseList() {
 
-    return repository.searchStudentsCourses();
+    return repository.searchStudentsCoursesList();
   }
 
   @Transactional
@@ -43,15 +52,10 @@ public class StudentService {
     }
   }
 
-  // 29課題　更新処理
-  // パラメーターから受け取ったidを元に該当idの受講生情報を取得
-  public Student searchIndividualStudent(int id) {
-    return repository.searchIndividualStudent(id);
-  }
-
+  // 課題外実装　課題28の時作成、以後リファクタリング実施。
   // パラメーターから受け取ったidを元に該当studentIdのコース情報を取得
-  public List<StudentsCourses> searchIndividualStudentCourses(int studentId) {
-    return repository.searchIndividualStudentCourses(studentId);
+  public List<StudentsCourses> searchIndividualStudentCourses(String studentId) {
+    return repository.searchStudentsCourse(studentId);
   }
 
   // 受講生、コースでそれぞれ更新をする
@@ -59,9 +63,11 @@ public class StudentService {
   public void updateStudent(StudentDetail studentDetail) {
     repository.updateStudent(studentDetail.getStudent());
 
-    // コース名のみを変更する機能も実装
     for (StudentsCourses studentsCourses : studentDetail.getStudentsCourses()) {
-      repository.updateCourse(studentsCourses);
+      if (studentDetail.getStudent().isDeleted()) {
+        studentsCourses.setDeleted(true);
+      }
+      repository.updateStudentsCourses(studentsCourses);
     }
   }
 
