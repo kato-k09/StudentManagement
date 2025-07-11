@@ -8,16 +8,16 @@ plugins {
 group = 'raisetech'
 version = '0.0.1-SNAPSHOT'
 
-java {configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+java {
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
     }
-}
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
-
 
 
 repositories {
@@ -29,6 +29,8 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     // Thymeleaf
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
+    // Validation
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     // Apache Commons Lang（便利機能、ユーティリティ）
     implementation("org.apache.commons:commons-lang3:3.17.0")
     // Lombok
