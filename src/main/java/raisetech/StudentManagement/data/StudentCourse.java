@@ -7,7 +7,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Setter
-public class StudentsCourses {
+public class StudentCourse {
 
   private String id;
   private String studentId;
