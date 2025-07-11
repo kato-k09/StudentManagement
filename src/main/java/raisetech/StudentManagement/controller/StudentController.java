@@ -79,7 +79,6 @@ public class StudentController {
 
   @GetMapping("/testException")
   public ResponseEntity<String> testException() throws TestException {
-    throw new TestException(
-        "現在このAPIは利用できません。URLは「studentList」ではなく「students」を利用してください。");
+    throw new TestException("例外テストです。");
   }
 }
