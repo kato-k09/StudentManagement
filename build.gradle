@@ -8,17 +8,17 @@ plugins {
 group = 'raisetech'
 version = '0.0.1-SNAPSHOT'
 
-java {
+java {configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
+
 
 repositories {
     mavenCentral()
