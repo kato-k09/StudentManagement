@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.exception.TestException;
 import raisetech.StudentManagement.service.StudentService;
 
 /**
@@ -76,4 +77,9 @@ public class StudentController {
     return ResponseEntity.ok("更新処理が成功しました。");
   }
 
+  @GetMapping("/testException")
+  public ResponseEntity<String> testException() throws TestException {
+    throw new TestException(
+        "現在このAPIは利用できません。URLは「studentList」ではなく「students」を利用してください。");
+  }
 }
