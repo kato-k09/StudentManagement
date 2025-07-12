@@ -1,5 +1,6 @@
 package raisetech.StudentManagement.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -36,6 +37,7 @@ public class StudentController {
    *
    * @return 受講生詳細一覧（全件）
    */
+  @Operation(summary = "一覧検索", description = "受講生の一覧を検索し、Json形式で結果を取得します。")
   @GetMapping("/studentList")
   public List<StudentDetail> getStudentList() {
     return service.searchStudentList();
@@ -47,6 +49,7 @@ public class StudentController {
    * @param id 受講生ID
    * @return 受講生
    */
+  @Operation(summary = "受講生検索", description = "idに紐づいた受講生を検索し、Json形式で結果を取得します。")
   @GetMapping("/student/{id}")
   public StudentDetail getStudent(@PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
     return service.searchStudent(id);
@@ -58,6 +61,7 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return 実行結果
    */
+  @Operation(summary = "受講生登録", description = "受講生を登録します。値はJson形式で設定する必要があります。IDは自動採番されるので設定不要です。")
   @PostMapping("/registerStudent")
   public ResponseEntity<StudentDetail> registerStudent(
       @Valid @RequestBody StudentDetail studentDetail) {
@@ -71,12 +75,14 @@ public class StudentController {
    * @param studentDetail 受講生詳細
    * @return 実行結果
    */
+  @Operation(summary = "受講生更新", description = "受講生を更新します。値はJson形式で設定する必要があります。設定した値全てが書き換わるので、変更したい箇所以外は既存の値を入れる必要があります。")
   @PutMapping("/updateStudent")
   public ResponseEntity<String> updateStudent(@Valid @RequestBody StudentDetail studentDetail) {
     service.updateStudent(studentDetail);
     return ResponseEntity.ok("更新処理が成功しました。");
   }
 
+  @Operation(summary = "例外テスト", description = "例外テストを実行します。")
   @GetMapping("/testException")
   public ResponseEntity<String> testException() throws TestException {
     throw new TestException("例外テストです。");
