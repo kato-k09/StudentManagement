@@ -84,6 +84,7 @@ public class StudentControllerTest {
   void 受講生詳細のコース情報で適切な値を入力した時に入力チェックに異常が発生しないこと() {
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setStudentId("999");
+    studentCourse.setCourseName("Java");
 
     Set<ConstraintViolation<StudentCourse>> violations = validator.validate(studentCourse);
 
