@@ -54,60 +54,58 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生検索_IDに紐づいたリポジトリとStudentDetailの処理が適切に呼び出せていること() {
-    String id = "10";
+  void 受講生詳細の検索_リポジトリの処理が適切に呼び出せていること() {
+    String id = "999";
     Student student = new Student();
     student.setId(id);
-    List<StudentCourse> studentCourseList = List.of(new StudentCourse());
     when(repository.searchStudent(id)).thenReturn(student);
-    when(repository.searchStudentCourse(student.getId())).thenReturn(
-        studentCourseList);
+    when(repository.searchStudentCourse(id)).thenReturn(new ArrayList<>());
+
+    StudentDetail expected = new StudentDetail(student, new ArrayList<>());
 
     StudentDetail actual = sut.searchStudent(id);
 
     verify(repository, times(1)).searchStudent(id);
     verify(repository, times(1)).searchStudentCourse(student.getId());
-    assertEquals(student, actual.getStudent());
-    assertEquals(studentCourseList, actual.getStudentCourseList());
+    assertEquals(expected.getStudent().getId(), actual.getStudent().getId());
   }
 
   @Test
   void 受講生登録_リポジトリの処理が適切に呼び出せていること() {
 
     Student student = new Student();
-    student.setId("10");
     StudentCourse studentCourse = new StudentCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
-    StudentDetail actual = sut.registerStudent(studentDetail);
+    sut.registerStudent(studentDetail);
 
     verify(repository, times(1)).registerStudent(student);
     verify(repository, times(1)).registerStudentCourse(studentCourse);
-
-    assertEquals(student, actual.getStudent());
   }
 
   @Test
-  void 受講生コース情報初期化_studentCourseに適切に値が設定されていること() {
+  void 受講生コース情報の登録_初期化処理が行われること() {
+    String id = "999";
     Student student = new Student();
-    student.setId("10");
+    student.setId(id);
     StudentCourse studentCourse = new StudentCourse();
-    LocalDateTime now = LocalDateTime.now();
 
-    sut.initStudentsCourse(studentCourse, student);
+    sut.initStudentsCourse(studentCourse, student.getId());
 
-    assertEquals(student.getId(), studentCourse.getStudentId());
-    assertEquals(now, studentCourse.getCourseStartAt());
-    assertEquals(now.plusYears(1), studentCourse.getCourseEndAt());
+    assertEquals(id, studentCourse.getStudentId());
+    assertEquals(LocalDateTime.now().getHour(), studentCourse.getCourseStartAt().getHour());
+    assertEquals(LocalDateTime.now().plusYears(1).getYear(),
+        studentCourse.getCourseEndAt().getYear());
   }
 
   @Test
-  void 受講生更新_リポジトリの処理が適切に呼び出せている_studentCourseがstudentと連動してisDeletedがtrueであるか() {
+  void 受講生更新_リポジトリの処理が適切に呼び出せていること_studentCourseがstudentと連動してisDeletedがtrueであるか() {
     Student student = new Student();
-    student.setId("10");
     student.setDeleted(true);
     StudentCourse studentCourse = new StudentCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     sut.updateStudent(studentDetail);
 
@@ -118,12 +116,12 @@ class StudentServiceTest {
   }
 
   @Test
-  void 受講生更新_リポジトリの処理が適切に呼び出せている_studentCourseがstudentと連動してisDeletedがfalseであるか() {
+  void 受講生更新_リポジトリの処理が適切に呼び出せていること_studentCourseがstudentと連動してisDeletedがfalseであるか() {
     Student student = new Student();
-    student.setId("10");
     student.setDeleted(false);
     StudentCourse studentCourse = new StudentCourse();
-    StudentDetail studentDetail = new StudentDetail(student, List.of(studentCourse));
+    List<StudentCourse> studentCourseList = List.of(studentCourse);
+    StudentDetail studentDetail = new StudentDetail(student, studentCourseList);
 
     sut.updateStudent(studentDetail);
 

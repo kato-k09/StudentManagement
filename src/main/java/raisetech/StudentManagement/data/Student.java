@@ -18,7 +18,7 @@ import lombok.Setter;
 public class Student {
 
   @Schema(description = "受講生IDです。受講生登録時には自動採番されるので値を入れる必要がありません。", example = "123")
-  @Pattern(regexp = "^\\d+$", message = "数値を入れてください。")
+  @Pattern(regexp = "^\\d+$", message = "数値のみ入力するようにしてください。")
   private String id;
 
   @Schema(description = "受講生の名前です。", example = "田中太郎")
@@ -45,7 +45,6 @@ public class Student {
   @Schema(description = "受講生の年齢です。1歳以上200歳以下の範囲で入力可能です。", example = "30")
   @Min(value = 1, message = "年齢を入力してください。")
   @Max(value = 200, message = "正しい年齢を入力してください。")
-  @NotBlank(message = "年齢を入力してください。")
   private int age;
 
   @Schema(description = "受講生の性別です。", example = "男")
