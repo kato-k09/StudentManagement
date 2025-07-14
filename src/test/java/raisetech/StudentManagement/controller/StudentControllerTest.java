@@ -91,7 +91,7 @@ public class StudentControllerTest {
   }
 
   @Test
-  void 受講生登録_受講生詳細情報を含んだリクエストでステータス200が返ること()
+  void 受講生登録_受講生詳細情報を含んだリクエストで異常が発生しないこと()
       throws Exception {
     when(service.registerStudent(any(StudentDetail.class))).thenReturn(new StudentDetail());
     String jsonRequest = """
@@ -122,7 +122,7 @@ public class StudentControllerTest {
   }
 
   @Test
-  void 受講生更新_受講生詳細情報を含んだリクエストでステータス200が返ること()
+  void 受講生更新_受講生詳細情報を含んだリクエストで異常が発生しないこと()
       throws Exception {
     String jsonRequest = """
         {
