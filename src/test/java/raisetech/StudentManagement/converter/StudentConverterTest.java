@@ -84,12 +84,6 @@ public class StudentConverterTest {
 
     List<StudentDetail> actual = sut.convertStudentDetails(studentList, studentCourseList);
 
-    // コンバーターの返り値がList<StudentDetail>になっているかの検証
-    assertThat(actual).isInstanceOf(List.class);
-    assertThat(actual).isNotEmpty();
-    assertThat(actual.get(0)).isInstanceOf(StudentDetail.class);
-    assertThat(actual.get(1)).isInstanceOf(StudentDetail.class);
-
     // コンバーターが受講生idとコース情報student_idを紐づけて変換しているかの検証
     assertThat(actual.get(0).getStudent().getId()).isEqualTo(
         actual.get(0).getStudentCourseList().get(0).getStudentId());
