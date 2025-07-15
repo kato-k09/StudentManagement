@@ -51,6 +51,15 @@
     VALUES (#{studentId}, #{courseName}, #{courseStartAt}, #{courseEndAt}, false)
   </insert>
 
+  <!-- コース申込状況の新規登録 -->
+  <insert id="registerCourseEnrollment"
+    parameterType="raisetech.StudentManagement.data.CourseEnrollment"
+    useGeneratedKeys="true" keyProperty="id">
+    INSERT INTO courses_enrollments(course_id, enrollment, is_deleted)
+    VALUES (#{courseId}, #{enrollment}, false)
+  </insert>
+
+
   <!-- 受講生を更新 -->
   <update id="updateStudent" parameterType="raisetech.StudentManagement.data.Student">
     UPDATE students
