@@ -1,6 +1,7 @@
 package raisetech.StudentManagement.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,8 +26,8 @@ class StudentRepositoryTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"1", "2", "3", "4", "5", "6"})
-  void 受講生の検索が行えること(String id) {
+  @ValueSource(strings = {"1", "2", "3", "4", "5"})
+  void 登録されているIDの受講生検索が行えること(String id) {
     Student actual = sut.searchStudent(id);
 
     switch (id) {
@@ -35,8 +36,14 @@ class StudentRepositoryTest {
       case "3" -> assertThat(actual.getName()).isEqualTo("田中啓二");
       case "4" -> assertThat(actual.getName()).isEqualTo("後藤桜");
       case "5" -> assertThat(actual.getName()).isEqualTo("野村佳奈多");
-      case "6" -> assertThat(actual).isNull();
     }
+  }
+
+  @Test
+  void 登録されていないIDの受講生検索が行えないこと() {
+    Student actual = sut.searchStudent("6");
+
+    assertThat(actual).isNull();
   }
 
   @Test
@@ -47,7 +54,7 @@ class StudentRepositoryTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"1", "2", "3", "4", "5"})
-  void 受講生コース情報の検索が行えること(String studentId) {
+  void 登録されている受講生IDで受講生コース情報の検索が行えること(String studentId) {
     List<StudentCourse> actual = sut.searchStudentCourse(studentId);
 
     switch (studentId) {
@@ -63,6 +70,13 @@ class StudentRepositoryTest {
       case "4" -> assertThat(actual.get(0).getCourseName()).isEqualTo("デザイン");
       case "5" -> assertThat(actual).isEmpty();
     }
+  }
+
+  @Test
+  void 登録されていない受講生IDで受講生コース情報の検索が行えないこと() {
+    List<StudentCourse> actual = sut.searchStudentCourse("6");
+
+    assertThat(actual).isEmpty();
   }
 
   @Test
@@ -86,6 +100,22 @@ class StudentRepositoryTest {
   }
 
   @Test
+  void 名前設定をせずに受講生の登録を行った時例外がスローされること() {
+    Student student = new Student();
+    student.setKanaName("タナカタロウ");
+    student.setNickname("たろー");
+    student.setEmail("test@example.com");
+    student.setArea("東京都");
+    student.setAge(30);
+    student.setSex("男");
+    student.setRemark("");
+    student.setDeleted(false);
+
+    assertThatThrownBy(() -> sut.registerStudent(student))
+        .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+  }
+
+  @Test
   void 受講生コース情報の登録が行えること() {
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setStudentId("999");
@@ -102,6 +132,18 @@ class StudentRepositoryTest {
   }
 
   @Test
+  void コース名を設定せずに受講生コース情報の登録を行った時に例外がスローされること() {
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setStudentId("999");
+    studentCourse.setCourseStartAt(LocalDateTime.now());
+    studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
+    studentCourse.setDeleted(false);
+
+    assertThatThrownBy(() -> sut.registerStudentCourse(studentCourse))
+        .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+  }
+
+  @Test
   void 受講生更新が行えること() {
     Student student = new Student();
     student.setId("1");
@@ -109,8 +151,8 @@ class StudentRepositoryTest {
     student.setKanaName("サトウヤスシ");
     student.setNickname("さとさん");
     student.setEmail("sato@gmail.com");
-    student.setArea("神奈川県");
-    student.setAge(40);
+    student.setArea("神奈川県"); // 期待更新箇所
+    student.setAge(40); // 期待更新箇所
     student.setSex("男");
     student.setRemark("");
     student.setDeleted(false);
@@ -119,7 +161,29 @@ class StudentRepositoryTest {
 
     Student actual = sut.searchStudent("1");
 
-    assertThat(actual).usingRecursiveComparison().isEqualTo(student);
+    assertThat(actual.getArea()).isEqualTo("神奈川県");
+    assertThat(actual.getAge()).isEqualTo(40);
+  }
+
+  @Test
+  void 受講生IDを設定せずに受講生更新を行った時に更新が行われないこと() {
+    Student student = new Student();
+    student.setName("佐藤泰");
+    student.setKanaName("サトウヤスシ");
+    student.setNickname("さとさん");
+    student.setEmail("sato@gmail.com");
+    student.setArea("神奈川県"); // 期待更新箇所
+    student.setAge(40); // 期待更新箇所
+    student.setSex("男");
+    student.setRemark("");
+    student.setDeleted(false);
+
+    sut.updateStudent(student);
+
+    Student actual = sut.searchStudent("1");
+
+    assertThat(actual.getArea()).isEqualTo("埼玉県");
+    assertThat(actual.getAge()).isEqualTo(33);
   }
 
   @Test
@@ -127,7 +191,7 @@ class StudentRepositoryTest {
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setId("1");
     studentCourse.setStudentId("1");
-    studentCourse.setCourseName("AWS");
+    studentCourse.setCourseName("デザイン"); // 期待更新箇所
     studentCourse.setCourseStartAt(LocalDateTime.parse("2025-04-12T00:00:00"));
     studentCourse.setCourseEndAt(LocalDateTime.parse("2025-08-31T23:59:59"));
     studentCourse.setDeleted(false);
@@ -136,8 +200,25 @@ class StudentRepositoryTest {
 
     List<StudentCourse> actual = sut.searchStudentCourse("1");
 
-    assertThat(actual.get(0)).usingRecursiveComparison().isEqualTo(studentCourse);
-    assertThat(actual.get(1)).usingRecursiveComparison().isNotEqualTo(studentCourse);
+    assertThat(actual.get(0).getCourseName()).isEqualTo("デザイン");
+    assertThat(actual.get(1).getCourseName()).isEqualTo("AWS"); // 受講生コース情報IDが異なるので更新処理がされないことを期待
+  }
+
+  @Test
+  void 受講生コースIDを設定せずに受講生コース情報更新を行った時に更新が行われないこと() {
+    StudentCourse studentCourse = new StudentCourse();
+    studentCourse.setStudentId("1");
+    studentCourse.setCourseName("デザイン"); // 期待更新箇所
+    studentCourse.setCourseStartAt(LocalDateTime.parse("2025-04-12T00:00:00"));
+    studentCourse.setCourseEndAt(LocalDateTime.parse("2025-08-31T23:59:59"));
+    studentCourse.setDeleted(false);
+
+    sut.updateStudentCourse(studentCourse);
+
+    List<StudentCourse> actual = sut.searchStudentCourse("1");
+
+    assertThat(actual.get(0).getCourseName()).isEqualTo("Java");
+    assertThat(actual.get(1).getCourseName()).isEqualTo("AWS");
   }
 
 }
