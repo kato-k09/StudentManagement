@@ -83,4 +83,13 @@
     WHERE id = #{id}
   </update>
 
+  <!-- コース申込状況を更新 -->
+  <update id="updateCourseEnrollment"
+    parameterType="raisetech.StudentManagement.data.CourseEnrollment">
+    UPDATE courses_enrollments
+    SET enrollment=#{enrollment},
+        is_deleted=#{isDeleted}
+    WHERE id = #{id}
+  </update>
+
 </mapper>

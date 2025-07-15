@@ -78,6 +78,7 @@ public class StudentService {
           .setCourseId(studentDetail.getStudentCourseList().get(i).getId());
       repository.registerCourseEnrollment(studentDetail.getCourseEnrollmentList().get(i));
     }
+
     return studentDetail;
   }
 
@@ -110,6 +111,13 @@ public class StudentService {
       }
       repository.updateStudentCourse(studentCourses);
     });
+
+    for (CourseEnrollment courseEnrollment : studentDetail.getCourseEnrollmentList()) {
+      if (studentDetail.getStudent().isDeleted()) {
+        courseEnrollment.setDeleted(true);
+      }
+      repository.updateCourseEnrollment(courseEnrollment);
+    }
   }
 
 }

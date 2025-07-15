@@ -87,4 +87,11 @@ public interface StudentRepository {
    */
   void updateStudentCourse(StudentCourse studentCourse);
 
+  /**
+   * コース申込状況を更新します。
+   *
+   * @param courseEnrollment コース申込状況
+   */
+  void updateCourseEnrollment(CourseEnrollment courseEnrollment);
+
 }
