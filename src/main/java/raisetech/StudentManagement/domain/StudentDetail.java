@@ -28,6 +28,6 @@ public class StudentDetail {
 
   @Schema(description = "コース申込状況オブジェクトです。")
   @Valid
-  private CourseEnrollment courseEnrollment;
+  private List<CourseEnrollment> courseEnrollmentList;
 
 }

@@ -28,6 +28,14 @@
     WHERE student_id = #{studentId}
   </select>
 
+  <!-- 受講生コース情報IDに紐づくコース申込状況を検索 -->
+  <select id="searchCourseEnrollment"
+    resultType="raisetech.StudentManagement.data.CourseEnrollment">
+    SELECT *
+    FROM courses_enrollments
+    WHERE course_id = #{courseId}
+  </select>
+
   <!-- 受講生情報の新規登録 -->
   <insert id="registerStudent" parameterType="raisetech.StudentManagement.data.Student"
     useGeneratedKeys="true" keyProperty="id">

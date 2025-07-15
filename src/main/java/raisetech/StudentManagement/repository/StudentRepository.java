@@ -49,7 +49,7 @@ public interface StudentRepository {
    * @param courseId 受講生コース情報ID
    * @return 受講生コース情報IDに紐づくコース申込状況
    */
-  List<CourseEnrollment> searchCourseEnrollment(String courseId);
+  CourseEnrollment searchCourseEnrollment(String courseId);
 
   /**
    * 受講生情報を新規登録します。IDに関しては自動採番を行う。

@@ -54,7 +54,7 @@ public class StudentService {
       courseEnrollmentList.add(repository.searchCourseEnrollment(studentCourse.getId()));
     }
 
-    return new StudentDetail(student, studentCourseList);
+    return new StudentDetail(student, studentCourseList, courseEnrollmentList);
   }
 
   /**
