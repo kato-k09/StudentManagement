@@ -1,11 +1,13 @@
 package raisetech.StudentManagement.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -45,8 +47,14 @@ public class StudentService {
    */
   public StudentDetail searchStudent(String id) {
     Student student = repository.searchStudent(id);
-    List<StudentCourse> studentCourse = repository.searchStudentCourse(student.getId());
-    return new StudentDetail(student, studentCourse);
+    List<StudentCourse> studentCourseList = repository.searchStudentCourse(student.getId());
+
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentCourseList) {
+      courseEnrollmentList.add(repository.searchCourseEnrollment(studentCourse.getId()));
+    }
+
+    return new StudentDetail(student, studentCourseList);
   }
 
   /**

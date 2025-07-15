@@ -7,9 +7,9 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
-import raisetech.StudentManagement.data.StudentEnrollment;
 
 @Schema(description = "受講生詳細")
 @Getter
@@ -26,8 +26,8 @@ public class StudentDetail {
   @Valid
   private List<StudentCourse> studentCourseList;
 
-  @Schema(description = "受講生申込状況オブジェクトです。")
+  @Schema(description = "コース申込状況オブジェクトです。")
   @Valid
-  private StudentEnrollment studentEnrollment;
+  private CourseEnrollment courseEnrollment;
 
 }
