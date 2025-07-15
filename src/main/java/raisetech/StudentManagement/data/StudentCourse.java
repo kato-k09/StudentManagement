@@ -28,7 +28,7 @@ public class StudentCourse {
   @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime courseEndAt;
 
-  @Schema(description = "受講生コース情報の論理削除フラグです。trueなら削除扱いとなります。")
+  @Schema(description = "受講生コース情報の論理削除フラグです。trueなら削除扱いとなります。", example = "true")
   private boolean isDeleted;
 
 }
