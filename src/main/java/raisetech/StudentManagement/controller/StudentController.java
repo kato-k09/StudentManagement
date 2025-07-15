@@ -83,8 +83,8 @@ public class StudentController {
   }
 
   @Operation(summary = "例外テスト", description = "例外テストを実行します。")
-  @GetMapping("/testException")
-  public ResponseEntity<String> testException() throws TestException {
-    throw new TestException("例外テストです。");
+  @GetMapping("/exception")
+  public ResponseEntity<String> exception() throws TestException {
+    throw new TestException("このAPIは現在利用できません。古いURLとなっています。");
   }
 }
