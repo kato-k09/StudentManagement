@@ -37,6 +37,13 @@ public interface StudentRepository {
   List<StudentCourse> searchStudentCourseList();
 
   /**
+   * コース申込状況の全件検索を行います。
+   *
+   * @return コース申込状況の情報（全件）
+   */
+  List<CourseEnrollment> searchCourseEnrollmentList();
+
+  /**
    * 受講生IDに紐づく受講生コース情報を検索します。
    *
    * @param studentId 受講生ID

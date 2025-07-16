@@ -36,7 +36,8 @@ public class StudentService {
   public List<StudentDetail> searchStudentList() {
     List<Student> studentList = repository.search();
     List<StudentCourse> studentCourseList = repository.searchStudentCourseList();
-    return converter.convertStudentDetails(studentList, studentCourseList);
+    List<CourseEnrollment> courseEnrollmentList = repository.searchCourseEnrollmentList();
+    return converter.convertStudentDetails(studentList, studentCourseList, courseEnrollmentList);
   }
 
   /**
@@ -89,11 +90,23 @@ public class StudentService {
       repository.registerStudentCourse(studentCourse);
     });
 
+    /* Jsonで送られてきた受講生コース情報とコース申込状況の順番でコース申込状況のcourseIdを設定する
     for (int i = 0; i < studentDetail.getCourseEnrollmentList().size(); i++) {
       studentDetail.getCourseEnrollmentList().get(i)
           .setCourseId(studentDetail.getStudentCourseList().get(i).getId());
       repository.registerCourseEnrollment(studentDetail.getCourseEnrollmentList().get(i));
+    }*/
+
+    // 受講生コース情報を元にコース申込状況を生成・受講生コース情報ID・仮申込情報を設定
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentDetail.getStudentCourseList()) {
+      CourseEnrollment courseEnrollment = new CourseEnrollment();
+      courseEnrollment.setCourseId(studentCourse.getId());
+      courseEnrollment.setEnrollment("仮申込");
+      repository.registerCourseEnrollment(courseEnrollment);
+      courseEnrollmentList.add(courseEnrollment);
     }
+    studentDetail.setCourseEnrollmentList(courseEnrollmentList);
 
     return studentDetail;
   }
