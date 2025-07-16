@@ -147,7 +147,8 @@
 
       <if
         test="studentDetailParams.courseEnrollmentList[0] != null and studentDetailParams.courseEnrollmentList[0].enrollment != null and studentDetailParams.courseEnrollmentList[0].enrollment != ''">
-        AND enrollment = #{studentDetailParams.courseEnrollmentList[0].enrollment}
+        AND enrollment =
+        #{studentDetailParams.courseEnrollmentList[0].enrollment, typeHandler=raisetech.StudentManagement.handler.EnrollmentStatusTypeHandler}
       </if>
 
       <if test="minAge != null and minAge != ''">

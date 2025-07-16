@@ -70,7 +70,10 @@ public class StudentService {
   public List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter) {
 
-    return repository.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter);
+    List<StudentDetail> filteredStudentDetails = repository.searchParams(studentDetailParams,
+        minAge,
+        maxAge, startAtBefore, endAtAfter);
+    return filteredStudentDetails;
   }
 
   /**
