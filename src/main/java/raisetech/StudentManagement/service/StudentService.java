@@ -58,6 +58,22 @@ public class StudentService {
   }
 
   /**
+   * 受講生パラメータ検索です。
+   *
+   * @param studentDetailParams StudentDetail内のフィールド名と同一の検索パラメータを指定できます。
+   * @param minAge              最小年齢を指定する検索パラメータです。
+   * @param maxAge              最大年齢を指定する検索パラメータです。
+   * @param startAtBefore       受講開始日がこの値より前を対象とした検索パラメータです。
+   * @param endAtAfter          受講終了予定日がこの値より後を対象とした検索パラメータです。
+   * @return パラメータ検索に該当した受講生詳細リスト
+   */
+  public List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
+      Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter) {
+
+    return repository.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter);
+  }
+
+  /**
    * 受講生詳細の登録を行います。受講生と受講生コース情報を個別に登録し、受講生コース情報には受講生情報を紐づける値や日付情報コース開始日、コース終了日を設定します。
    *
    * @param studentDetail 受講生詳細

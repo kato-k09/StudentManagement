@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
 @Schema(description = "受講生コース情報")
 @Getter
@@ -20,12 +19,10 @@ public class StudentCourse {
   @Schema(description = "受講生コース情報のコース名です。", example = "Java")
   private String courseName;
 
-  @Schema(description = "受講生コース情報の受講開始日です。受講生登録時に自動的に現在時刻が設定されます。", example = "2025-01-01 19:00:00")
-  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @Schema(description = "受講生コース情報の受講開始日です。受講生登録時に自動的に現在時刻が設定されます。", example = "2025-01-01T19:00:00")
   private LocalDateTime courseStartAt;
 
-  @Schema(description = "受講生コース情報の受講終了予定日です。受講生登録時より1年後が自動的に設定されます。", example = "2025-01-01 19:00:00")
-  @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+  @Schema(description = "受講生コース情報の受講終了予定日です。受講生登録時より1年後が自動的に設定されます。", example = "2025-01-01T19:00:00")
   private LocalDateTime courseEndAt;
 
   @Schema(description = "受講生コース情報の論理削除フラグです。trueなら削除扱いとなります。", example = "true")

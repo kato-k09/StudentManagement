@@ -1,10 +1,12 @@
 package raisetech.StudentManagement.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.StudentDetail;
 
 /**
  * 受講生テーブルと受講生コース情報テーブルと紐づくRepositoryです。
@@ -50,6 +52,19 @@ public interface StudentRepository {
    * @return 受講生コース情報IDに紐づくコース申込状況
    */
   CourseEnrollment searchCourseEnrollment(String courseId);
+
+  /**
+   * 受講生パラメータ検索です。
+   *
+   * @param studentDetailParams StudentDetail内のフィールド名と同一の検索パラメータを指定できます。
+   * @param minAge              最小年齢を指定する検索パラメータです。
+   * @param maxAge              最大年齢を指定する検索パラメータです。
+   * @param startAtBefore       受講開始日がこの値より前を対象とした検索パラメータです。
+   * @param endAtAfter          受講終了予定日がこの値より後を対象とした検索パラメータです。
+   * @return パラメータ検索に該当した受講生詳細リスト
+   */
+  List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
+      Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter);
 
   /**
    * 受講生情報を新規登録します。IDに関しては自動採番を行う。

@@ -21,3 +21,4 @@ public class CourseEnrollment {
   @Schema(description = "コース申込状況の論理削除フラグです。trueなら削除扱いとなります。", example = "true")
   boolean isDeleted;
 }
+

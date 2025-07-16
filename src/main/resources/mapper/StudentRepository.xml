@@ -36,6 +36,136 @@
     WHERE course_id = #{courseId}
   </select>
 
+  <!-- 受講生詳細情報パラメーターを元にした受講生詳細情報を検索 -->
+  <resultMap id="StudentDetailResultMap" type="raisetech.StudentManagement.domain.StudentDetail">
+    <association property="student" javaType="raisetech.StudentManagement.data.Student">
+      <id property="id" column="s_id"/>
+      <result property="name" column="name"/>
+      <result property="kanaName" column="kana_name"/>
+      <result property="nickname" column="nickname"/>
+      <result property="email" column="email"/>
+      <result property="area" column="area"/>
+      <result property="age" column="age"/>
+      <result property="sex" column="sex"/>
+      <result property="remark" column="remark"/>
+      <result property="isDeleted" column="s_is_deleted"/>
+    </association>
+
+    <collection property="studentCourseList"
+      ofType="raisetech.StudentManagement.data.StudentCourse">
+      <id property="id" column="sc_id"/>
+      <result property="studentId" column="student_id"/>
+      <result property="courseName" column="course_name"/>
+      <result property="courseStartAt" column="course_start_at"/>
+      <result property="courseEndAt" column="course_end_at"/>
+      <result property="isDeleted" column="sc_is_deleted"/>
+    </collection>
+
+    <collection property="courseEnrollmentList"
+      ofType="raisetech.StudentManagement.data.CourseEnrollment">
+      <id property="id" column="ce_id"/>
+      <result property="courseId" column="course_id"/>
+      <result property="enrollment" column="enrollment"/>
+      <result property="isDeleted" column="ce_is_deleted"/>
+    </collection>
+  </resultMap>
+
+  <select id="searchParams" resultMap="StudentDetailResultMap">
+    SELECT
+    s.id AS s_id,
+    s.name,
+    s.kana_name,
+    s.nickname,
+    s.email,
+    s.area,
+    s.age,
+    s.sex,
+    s.remark,
+    s.is_deleted AS s_is_deleted,
+
+    sc.id AS sc_id,
+    sc.student_id,
+    sc.course_name,
+    sc.course_start_at,
+    sc.course_end_at,
+    sc.is_deleted AS sc_is_deleted,
+
+    ce.id AS ce_id,
+    ce.course_id,
+    ce.enrollment,
+    ce.is_deleted AS ce_is_deleted
+
+    FROM students s
+    LEFT JOIN students_courses sc ON s.id = sc.student_id
+    LEFT JOIN courses_enrollments ce ON sc.id = ce.course_id
+    <where>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.name != null and studentDetailParams.student.name != ''">
+        AND name LIKE CONCAT('%', #{studentDetailParams.student.name}, '%')
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.kanaName != null and studentDetailParams.student.kanaName != ''">
+        AND kana_name LIKE CONCAT('%', #{studentDetailParams.student.kanaName}, '%')
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.nickname != null and studentDetailParams.student.nickname != ''">
+        AND nickname LIKE CONCAT('%', #{studentDetailParams.student.nickname}, '%')
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.email != null and studentDetailParams.student.email != ''">
+        AND email LIKE CONCAT('%', #{studentDetailParams.student.email}, '%')
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.area != null and studentDetailParams.student.area != ''">
+        AND area = #{studentDetailParams.student.area}
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.age != null and studentDetailParams.student.age != ''">
+        AND age = #{studentDetailParams.student.age}
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.sex != null and studentDetailParams.student.sex != ''">
+        AND sex = #{studentDetailParams.student.sex}
+      </if>
+      <if
+        test="studentDetailParams.student != null and studentDetailParams.student.remark != null and studentDetailParams.student.remark != ''">
+        AND remark LIKE CONCAT('%', #{studentDetailParams.student.remark}, '%')
+      </if>
+
+      <if
+        test="studentDetailParams.studentCourseList[0] != null and studentDetailParams.studentCourseList[0].courseName != null and studentDetailParams.studentCourseList[0].courseName != ''">
+        AND course_name = #{studentDetailParams.studentCourseList[0].courseName}
+      </if>
+      <if
+        test="studentDetailParams.studentCourseList[0] != null and studentDetailParams.studentCourseList[0].courseStartAt != null">
+        AND course_start_at &gt;= #{studentDetailParams.studentCourseList[0].courseStartAt}
+      </if>
+      <if
+        test="studentDetailParams.studentCourseList[0] != null and studentDetailParams.studentCourseList[0].courseEndAt != null">
+        AND course_End_at &lt;= #{studentDetailParams.studentCourseList[0].courseEndAt}
+      </if>
+
+      <if
+        test="studentDetailParams.courseEnrollmentList[0] != null and studentDetailParams.courseEnrollmentList[0].enrollment != null and studentDetailParams.courseEnrollmentList[0].enrollment != ''">
+        AND enrollment = #{studentDetailParams.courseEnrollmentList[0].enrollment}
+      </if>
+
+      <if test="minAge != null and minAge != ''">
+        AND age &gt;= #{minAge}
+      </if>
+      <if test="maxAge != null and maxAge != ''">
+        AND age &lt;= #{maxAge}
+      </if>
+
+      <if test="startAtBefore != null">
+        AND course_start_at &lt;= #{startAtBefore}
+      </if>
+      <if test="endAtAfter != null">
+        AND course_end_at &gt;= #{endAtAfter}
+      </if>
+    </where>
+  </select>
+
   <!-- 受講生情報の新規登録 -->
   <insert id="registerStudent" parameterType="raisetech.StudentManagement.data.Student"
     useGeneratedKeys="true" keyProperty="id">
