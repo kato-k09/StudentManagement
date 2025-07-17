@@ -144,7 +144,36 @@ public class StudentControllerTest {
                 """
         ))
         .andExpect(status().isOk());
-    verify(service, times(1)).registerStudent(any());
+    verify(service, times(1)).registerStudent(any(StudentDetail.class));
+  }
+
+  @Test
+  void 受講生登録後のコース追加が実行できて空で返ってくること() throws Exception {
+    when(service.addCourse(any(StudentDetail.class))).thenReturn(new StudentDetail());
+    mockMvc.perform(post("/addCourse").contentType(APPLICATION_JSON).content(
+            """
+                {
+                  "student": {
+                    "id": "7",
+                    "name": "丹沢修司",
+                    "kanaName": "タンザワシュウジ",
+                    "nickname": "しゅー",
+                    "email": "tanzawa@gmail.com",
+                    "area": "茨城県",
+                    "age": 28,
+                    "sex": "男",
+                    "remark": ""
+                  },
+                  "studentCourseList": [
+                    {
+                      "courseName": "デザイン"
+                    }
+                  ]
+                }
+                """
+        ))
+        .andExpect(status().isOk());
+    verify(service, times(1)).addCourse(any(StudentDetail.class));
   }
 
   @Test

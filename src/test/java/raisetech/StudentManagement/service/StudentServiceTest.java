@@ -151,6 +151,20 @@ class StudentServiceTest {
         studentCourse.getCourseEndAt().getYear());
   }
 
+  @Test
+  void 受講生登録後のコース追加を実行できること() {
+    StudentDetail studentDetail = new StudentDetail(new Student(), List.of(new StudentCourse()),
+        null);
+    studentDetail.getStudent().setId("3");
+    studentDetail.getStudentCourseList().get(0).setCourseName("デザイン");
+
+    StudentDetail actual = sut.addCourse(studentDetail);
+
+    verify(repository, times(1)).registerStudentCourse(any(StudentCourse.class));
+    verify(repository, times(1)).registerCourseEnrollment(any(CourseEnrollment.class));
+    assertThat(actual.getStudentCourseList().get(0).getCourseName()).isEqualTo("デザイン");
+  }
+
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
   void 受講生更新_リポジトリの処理が適切に呼び出せていること_削除フラグが連動していること(

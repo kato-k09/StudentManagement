@@ -118,8 +118,12 @@ public class StudentService {
     studentCourses.setCourseEndAt(now.plusYears(1));
   }
 
-  // TODO 後で見直す
-
+  /**
+   * 受講生IDに紐づけてコースを追加します。
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
   @Transactional
   public StudentDetail addCourse(StudentDetail studentDetail) {
     Student student = studentDetail.getStudent();

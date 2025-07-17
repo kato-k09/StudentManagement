@@ -103,6 +103,12 @@ public class StudentController {
     return ResponseEntity.ok(responseStudentDetail);
   }
 
+  /**
+   * 受講生IDに紐づけてコースを追加します。
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
   @PostMapping("/addCourse")
   public ResponseEntity<StudentDetail> addCourse(@Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.addCourse(studentDetail);
