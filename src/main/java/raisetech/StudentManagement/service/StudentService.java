@@ -35,6 +35,9 @@ public class StudentService {
    */
   public List<StudentDetail> searchStudentList() {
     List<Student> studentList = repository.search();
+    if (studentList == null) {
+      throw new RuntimeException("登録されている受講生が存在しません。");
+    }
     List<StudentCourse> studentCourseList = repository.searchStudentCourseList();
     List<CourseEnrollment> courseEnrollmentList = repository.searchCourseEnrollmentList();
     return converter.convertStudentDetails(studentList, studentCourseList, courseEnrollmentList);
@@ -48,6 +51,9 @@ public class StudentService {
    */
   public StudentDetail searchStudent(String id) {
     Student student = repository.searchStudent(id);
+    if (student == null) {
+      throw new RuntimeException("指定された受講生が見つかりません: ID = " + id);
+    }
     List<StudentCourse> studentCourseList = repository.searchStudentCourse(student.getId());
 
     List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();

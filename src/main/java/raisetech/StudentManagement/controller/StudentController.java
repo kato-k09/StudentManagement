@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -62,7 +64,7 @@ public class StudentController {
       @PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
     StudentDetail responseStudentDetail = service.searchStudent(id);
     if (responseStudentDetail == null) {
-      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+      return ResponseEntity.ok(new StudentDetail());
     }
     return ResponseEntity.ok(responseStudentDetail);
   }
@@ -107,7 +109,7 @@ public class StudentController {
       @Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
     if (responseStudentDetail == null) {
-      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+      return ResponseEntity.ok(new StudentDetail());
     }
     return ResponseEntity.ok(responseStudentDetail);
   }
@@ -122,7 +124,7 @@ public class StudentController {
   public ResponseEntity<StudentDetail> addCourse(@Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.addCourse(studentDetail);
     if (responseStudentDetail == null) {
-      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+      return ResponseEntity.ok(new StudentDetail());
     }
     return ResponseEntity.ok(responseStudentDetail);
   }
@@ -144,5 +146,10 @@ public class StudentController {
   @GetMapping("/exception")
   public ResponseEntity<String> exception() throws TestException {
     throw new TestException("このAPIは現在利用できません。古いURLとなっています。");
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 }
