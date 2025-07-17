@@ -21,7 +21,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.converter.StudentConverter;
 import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;

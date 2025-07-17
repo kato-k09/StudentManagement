@@ -1,4 +1,4 @@
-package raisetech.StudentManagement.controller.converter;
+package raisetech.StudentManagement.converter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +36,10 @@ public class StudentConverter {
 
       List<CourseEnrollment> convertCourseEnrollmentList = new ArrayList<>();
       for (StudentCourse studentCourse : convertStudentCourseList) {
-        convertCourseEnrollmentList = courseEnrollmentList.stream()
+        convertCourseEnrollmentList.addAll(courseEnrollmentList.stream()
             .filter(
                 courseEnrollment -> courseEnrollment.getCourseId().equals(studentCourse.getId()))
-            .collect(Collectors.toList());
+            .collect(Collectors.toList()));
       }
       studentDetail.setCourseEnrollmentList(convertCourseEnrollmentList);
 

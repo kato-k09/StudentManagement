@@ -103,6 +103,12 @@ public class StudentController {
     return ResponseEntity.ok(responseStudentDetail);
   }
 
+  @PostMapping("/addCourse")
+  public ResponseEntity<StudentDetail> addCourse(@Valid @RequestBody StudentDetail studentDetail) {
+    StudentDetail responseStudentDetail = service.addCourse(studentDetail);
+    return ResponseEntity.ok(responseStudentDetail);
+  }
+
   /**
    * 受講生詳細の更新を行います。 キャンセルフラグの更新もここで行います（論理削除）。
    *

@@ -6,7 +6,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.converter.StudentConverter;
 import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
@@ -116,6 +116,31 @@ public class StudentService {
     studentCourses.setStudentId(id);
     studentCourses.setCourseStartAt(now);
     studentCourses.setCourseEndAt(now.plusYears(1));
+  }
+
+  // TODO 後で見直す
+
+  @Transactional
+  public StudentDetail addCourse(StudentDetail studentDetail) {
+    Student student = studentDetail.getStudent();
+
+    studentDetail.getStudentCourseList().forEach(studentCourse -> {
+      initStudentsCourse(studentCourse, student.getId());
+      repository.registerStudentCourse(studentCourse);
+    });
+
+    // 受講生コース情報を元にコース申込状況を生成・受講生コース情報ID・仮申込情報を設定
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentDetail.getStudentCourseList()) {
+      CourseEnrollment courseEnrollment = new CourseEnrollment();
+      courseEnrollment.setCourseId(studentCourse.getId());
+      courseEnrollment.setEnrollment("仮申込");
+      repository.registerCourseEnrollment(courseEnrollment);
+      courseEnrollmentList.add(courseEnrollment);
+    }
+    studentDetail.setCourseEnrollmentList(courseEnrollmentList);
+
+    return studentDetail;
   }
 
   /**
