@@ -46,8 +46,8 @@ public class StudentController {
    */
   @Operation(summary = "一覧検索", description = "受講生の一覧を検索し、Json形式で結果を取得します。")
   @GetMapping("/studentList")
-  public List<StudentDetail> getStudentList() {
-    return service.searchStudentList();
+  public ResponseEntity<List<StudentDetail>> getStudentList() {
+    return ResponseEntity.ok(service.searchStudentList());
   }
 
   /**
@@ -58,8 +58,13 @@ public class StudentController {
    */
   @Operation(summary = "受講生検索", description = "idに紐づいた受講生を検索し、Json形式で結果を取得します。")
   @GetMapping("/student/{id}")
-  public StudentDetail getStudent(@PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
-    return service.searchStudent(id);
+  public ResponseEntity<StudentDetail> getStudent(
+      @PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
+    StudentDetail responseStudentDetail = service.searchStudent(id);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+    }
+    return ResponseEntity.ok(responseStudentDetail);
   }
 
   /**
@@ -75,7 +80,7 @@ public class StudentController {
    * @return パラメータ検索に該当した受講生詳細リスト
    */
   @GetMapping("/searchParams")
-  public List<StudentDetail> searchParams(@ModelAttribute Student studentParams,
+  public ResponseEntity<List<StudentDetail>> searchParams(@ModelAttribute Student studentParams,
       @ModelAttribute StudentCourse studentCourseParams,
       @ModelAttribute CourseEnrollment courseEnrollmentParams,
       @RequestParam(name = "minAge", required = false) Integer minAge,
@@ -86,7 +91,8 @@ public class StudentController {
     StudentDetail studentDetailParams = new StudentDetail(studentParams,
         List.of(studentCourseParams), List.of(courseEnrollmentParams));
 
-    return service.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter);
+    return ResponseEntity.ok(
+        service.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter));
   }
 
   /**
@@ -100,6 +106,9 @@ public class StudentController {
   public ResponseEntity<StudentDetail> registerStudent(
       @Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+    }
     return ResponseEntity.ok(responseStudentDetail);
   }
 
@@ -112,6 +121,9 @@ public class StudentController {
   @PostMapping("/addCourse")
   public ResponseEntity<StudentDetail> addCourse(@Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.addCourse(studentDetail);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail()); // 空オブジェクトを返す
+    }
     return ResponseEntity.ok(responseStudentDetail);
   }
 

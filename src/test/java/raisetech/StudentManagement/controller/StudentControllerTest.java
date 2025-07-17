@@ -42,7 +42,8 @@ public class StudentControllerTest {
   @Test
   void 受講生詳細の一覧検索が実行できて空のリストが返ってくること() throws Exception {
     mockMvc.perform(get("/studentList"))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
     verify(service, times(1)).searchStudentList();
   }
 
@@ -50,7 +51,8 @@ public class StudentControllerTest {
   void 受講生詳細の検索が実行できて空のリストが返ってくること() throws Exception {
     String id = "999";
     mockMvc.perform(get("/student/{id}", id))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().json("{}"));
     verify(service, times(1)).searchStudent(id);
   }
 
@@ -111,12 +113,27 @@ public class StudentControllerTest {
             .param("maxAge", "30")
             .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString())
             .param("endAtAfter", LocalDateTime.of(2025, 10, 1, 0, 0).toString()))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
 
     verify(service, times(1))
-        .searchParams(any(StudentDetail.class), any(Integer.class), any(Integer.class),
-            any(LocalDateTime.class),
-            any(LocalDateTime.class));
+        .searchParams(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void 受講生パラメーター検索が一部パラメーターの指定が無くても実行できて空のリストが返ってくること()
+      throws Exception {
+    mockMvc.perform(get("/searchParams")
+            .param("student.name", "佐藤")
+            .param("studentCourse.courseName", "Java")
+            .param("courseEnrollment.enrollment", "受講中")
+            .param("minAge", "20")
+            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    verify(service, times(1))
+        .searchParams(any(), any(), any(), any(), any());
   }
 
   @Test
@@ -143,7 +160,8 @@ public class StudentControllerTest {
                 }
                 """
         ))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().json("{}"));
     verify(service, times(1)).registerStudent(any(StudentDetail.class));
   }
 
@@ -172,7 +190,8 @@ public class StudentControllerTest {
                 }
                 """
         ))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().json("{}"));
     verify(service, times(1)).addCourse(any(StudentDetail.class));
   }
 
@@ -213,7 +232,8 @@ public class StudentControllerTest {
                 }
                 """
         ))
-        .andExpect(status().isOk());
+        .andExpect(status().isOk())
+        .andExpect(content().string("更新処理が成功しました。"));
     verify(service, times(1)).updateStudent(any());
   }
 
