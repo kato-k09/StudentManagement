@@ -7,8 +7,11 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.junit.jupiter.MockitoExtension;
 import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -24,7 +27,7 @@ public class StudentConverterTest {
   }
 
   @Test
-  void 受講生のリストと受講生コース情報のリストを渡して受講生詳細のリストが作成できること() {
+  void 受講生のリストと受講生コース情報のリストとコース申込状況のリストを渡して受講生詳細のリストが作成できること() {
     Student student = createStudent();
 
     StudentCourse studentCourse = new StudentCourse();
@@ -34,34 +37,52 @@ public class StudentConverterTest {
     studentCourse.setCourseStartAt(LocalDateTime.now());
     studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
 
+    CourseEnrollment courseEnrollment = new CourseEnrollment();
+    courseEnrollment.setId("1");
+    courseEnrollment.setCourseId("1");
+    courseEnrollment.setEnrollment("受講中");
+
     List<Student> studentList = List.of(student);
     List<StudentCourse> studentCourseList = List.of(studentCourse);
+    List<CourseEnrollment> courseEnrollmentList = List.of(courseEnrollment);
 
-    List<StudentDetail> actual = sut.convertStudentDetails(studentList, studentCourseList);
+    List<StudentDetail> actual = sut.convertStudentDetails(studentList, studentCourseList,
+        courseEnrollmentList);
 
     assertThat(actual.get(0).getStudent()).isEqualTo(student);
     assertThat(actual.get(0).getStudentCourseList()).isEqualTo(studentCourseList);
-
+    assertThat(actual.get(0).getCourseEnrollmentList()).isEqualTo(courseEnrollmentList);
   }
 
-  @Test
-  void 受講生のリストと受講生コース情報のリストを渡した時に紐づかない受講生コース情報は除外されること() {
+  @ParameterizedTest
+  @ValueSource(strings = {"999", "1"})
+    // 受講生コース情報のコースIDとコース申込状況のコースIDが一致している場合も検証します。
+  void 受講生のリストと受講生コース情報のリストとコース申込状況のリストを渡した時に紐づかない受講生コース情報とコース申込状況は除外されること(
+      String courseId) {
     Student student = createStudent();
 
     StudentCourse studentCourse = new StudentCourse();
     studentCourse.setId("1");
-    studentCourse.setStudentId("2");
+    studentCourse.setStudentId("11");
     studentCourse.setCourseName("Java");
     studentCourse.setCourseStartAt(LocalDateTime.now());
     studentCourse.setCourseEndAt(LocalDateTime.now().plusYears(1));
 
+    CourseEnrollment courseEnrollment = new CourseEnrollment();
+    courseEnrollment.setId("111");
+    courseEnrollment.setCourseId(courseId);
+    courseEnrollment.setEnrollment("受講中");
+
     List<Student> studentList = List.of(student);
     List<StudentCourse> studentCourseList = List.of(studentCourse);
+    List<CourseEnrollment> courseEnrollmentList = List.of(courseEnrollment);
 
-    List<StudentDetail> actual = sut.convertStudentDetails(studentList, studentCourseList);
+    List<StudentDetail> actual = sut.convertStudentDetails(studentList, studentCourseList,
+        courseEnrollmentList);
 
     assertThat(actual.get(0).getStudent()).isEqualTo(student);
     assertThat(actual.get(0).getStudentCourseList()).isEmpty();
+    assertThat(actual.get(0).getCourseEnrollmentList()).isEmpty();
 
   }
 

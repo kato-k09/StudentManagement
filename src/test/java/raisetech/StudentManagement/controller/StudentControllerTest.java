@@ -16,6 +16,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
+import java.time.LocalDateTime;
 import java.util.Set;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -101,7 +102,25 @@ public class StudentControllerTest {
   }
 
   @Test
-  void 受講生登録詳細の登録が実行できて空で返ってくること() throws Exception {
+  void 受講生パラメーター検索が実行できて空のリストが返ってくること() throws Exception {
+    mockMvc.perform(get("/searchParams")
+            .param("student.name", "佐藤")
+            .param("studentCourse.courseName", "Java")
+            .param("courseEnrollment.enrollment", "受講中")
+            .param("minAge", "20")
+            .param("maxAge", "30")
+            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString())
+            .param("endAtAfter", LocalDateTime.of(2025, 10, 1, 0, 0).toString()))
+        .andExpect(status().isOk());
+
+    verify(service, times(1))
+        .searchParams(any(StudentDetail.class), any(Integer.class), any(Integer.class),
+            any(LocalDateTime.class),
+            any(LocalDateTime.class));
+  }
+
+  @Test
+  void 受講生登録が実行できて空で返ってくること() throws Exception {
     when(service.registerStudent(any(StudentDetail.class))).thenReturn(new StudentDetail());
     mockMvc.perform(post("/registerStudent").contentType(APPLICATION_JSON).content(
             """
@@ -129,14 +148,7 @@ public class StudentControllerTest {
   }
 
   @Test
-  void 受講生詳細の例外APIが実行できてステータスが400で返ってくること() throws Exception {
-    mockMvc.perform(get("/exception"))
-        .andExpect(status().is4xxClientError())
-        .andExpect(content().string("このAPIは現在利用できません。古いURLとなっています。"));
-  }
-
-  @Test
-  void 受講生更新_受講生詳細情報を含んだリクエストで異常が発生しないこと() throws Exception {
+  void 受講生更新が受講生詳細情報を含んだリクエストで実行できること() throws Exception {
 
     mockMvc.perform(put("/updateStudent").contentType(APPLICATION_JSON).content(
             """
@@ -161,11 +173,25 @@ public class StudentControllerTest {
                       "courseStartAt": "2025-01-01T00:00:00.000000",
                       "courseEndAt": "2025-04-01T00:00:00.000000"
                     }
+                  ],
+                  "courseEnrollmentList": [
+                    {
+                      "id": "999",
+                      "courseId": "999",
+                      "enrollment": "受講中"
+                    }
                   ]
                 }
                 """
         ))
         .andExpect(status().isOk());
     verify(service, times(1)).updateStudent(any());
+  }
+
+  @Test
+  void 受講生詳細の例外APIが実行できてステータスが400で返ってくること() throws Exception {
+    mockMvc.perform(get("/exception"))
+        .andExpect(status().is4xxClientError())
+        .andExpect(content().string("このAPIは現在利用できません。古いURLとなっています。"));
   }
 }

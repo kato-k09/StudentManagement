@@ -2,16 +2,22 @@ package raisetech.StudentManagement.repository;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static raisetech.StudentManagement.testutil.GetStudentDetailParams.getStudentDetailParams;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mybatis.spring.boot.test.autoconfigure.MybatisTest;
 import org.springframework.beans.factory.annotation.Autowired;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
+import raisetech.StudentManagement.domain.StudentDetail;
 
 @MybatisTest
 class StudentRepositoryTest {
@@ -52,6 +58,12 @@ class StudentRepositoryTest {
     assertThat(actual.size()).isEqualTo(6);
   }
 
+  @Test
+  void コース申込状況の全件検索が行えること() {
+    List<CourseEnrollment> actual = sut.searchCourseEnrollmentList();
+    assertThat(actual.size()).isEqualTo(6);
+  }
+
   @ParameterizedTest
   @ValueSource(strings = {"1", "2", "3", "4", "5"})
   void 登録されている受講生IDで受講生コース情報の検索が行えること(String studentId) {
@@ -77,6 +89,74 @@ class StudentRepositoryTest {
     List<StudentCourse> actual = sut.searchStudentCourse("6");
 
     assertThat(actual).isEmpty();
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"1", "2", "3", "4", "5", "6"})
+  void 登録されている受講生コース情報IDでコース申込状況の検索が行えること(String courseId) {
+    CourseEnrollment actual = sut.searchCourseEnrollment(courseId);
+
+    switch (courseId) {
+      case "1" -> assertThat(actual.getEnrollment()).isEqualTo("受講終了");
+      case "2" -> assertThat(actual.getEnrollment()).isEqualTo("本申込");
+      case "3" -> assertThat(actual.getEnrollment()).isEqualTo("仮申込");
+      case "4" -> assertThat(actual.getEnrollment()).isEqualTo("仮申込");
+      case "5" -> assertThat(actual.getEnrollment()).isEqualTo("受講中");
+      case "6" -> assertThat(actual.getEnrollment()).isEqualTo("受講中");
+    }
+  }
+
+  @Test
+  void 登録されていない受講生コース情報IDでコース申込状況の検索が行えないこと() {
+    CourseEnrollment actual = sut.searchCourseEnrollment("7");
+
+    assertThat(actual).isNull();
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideSearchParams")
+  void 受講生パラーメーター検索が行えること(int testIndex, Integer minAge,
+      Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter,
+      String name, String courseName, String enrollment) {
+
+    StudentDetail studentDetailParams = getStudentDetailParams(name,
+        courseName, enrollment);
+
+    List<StudentDetail> actual = sut.searchParams(studentDetailParams, minAge, maxAge,
+        startAtBefore, endAtAfter);
+
+    switch (testIndex) {
+      case 1 -> assertThat(actual.size()).isEqualTo(0);
+      case 2 -> assertThat(actual.size()).isEqualTo(1);
+      case 3 -> assertThat(actual.size()).isEqualTo(3);
+      case 4 -> assertThat(actual.size()).isEqualTo(5);
+      case 5 -> assertThat(actual.size()).isEqualTo(5);
+      case 6 -> assertThat(actual.get(0).getStudent().getName()).isEqualTo("野村佳奈多");
+      case 7 -> {
+        assertThat(actual.get(0).getStudent().getName()).isEqualTo("佐藤泰");
+        assertThat(actual.get(1).getStudent().getName()).isEqualTo("田中啓二");
+      }
+      case 8 -> {
+        assertThat(actual.get(0).getStudent().getName()).isEqualTo("田中啓二");
+        assertThat(actual.get(1).getStudent().getName()).isEqualTo("後藤桜");
+      }
+    }
+  }
+
+  static Stream<Arguments> provideSearchParams() {
+
+    LocalDateTime startAtBefore = LocalDateTime.of(2025, 6, 1, 0, 0);
+    LocalDateTime endAtAfter = LocalDateTime.of(2025, 10, 1, 0, 0);
+    return Stream.of(
+        Arguments.of(1, 20, 30, startAtBefore, endAtAfter, null, null, null),
+        Arguments.of(2, 20, 30, startAtBefore, null, null, null, null),
+        Arguments.of(3, 20, 30, null, null, null, null, null),
+        Arguments.of(4, 20, null, null, null, null, null, null),
+        Arguments.of(5, null, null, null, null, null, null, null),
+        Arguments.of(6, null, null, null, null, "野村", null, null),
+        Arguments.of(7, null, null, null, null, null, "AWS", null),
+        Arguments.of(8, null, null, null, null, null, null, "受講中")
+    );
   }
 
   @Test
@@ -141,6 +221,20 @@ class StudentRepositoryTest {
 
     assertThatThrownBy(() -> sut.registerStudentCourse(studentCourse))
         .isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class);
+  }
+
+  @Test
+  void コース申込状況の登録が行えること() {
+    CourseEnrollment courseEnrollment = new CourseEnrollment();
+    courseEnrollment.setCourseId("999");
+    courseEnrollment.setEnrollment("仮申込"); // サービスで強制的に入力されるので設定しない場合のテストは行いません。
+    courseEnrollment.setDeleted(false);
+
+    sut.registerCourseEnrollment(courseEnrollment);
+
+    List<CourseEnrollment> actual = sut.searchCourseEnrollmentList();
+
+    assertThat(actual.size()).isEqualTo(7);
   }
 
   @Test
@@ -219,6 +313,33 @@ class StudentRepositoryTest {
 
     assertThat(actual.get(0).getCourseName()).isEqualTo("Java");
     assertThat(actual.get(1).getCourseName()).isEqualTo("AWS");
+  }
+
+  @Test
+  void コース申込状況更新が行えること() {
+    CourseEnrollment courseEnrollment = new CourseEnrollment();
+    courseEnrollment.setId("3");
+    courseEnrollment.setEnrollment("受講中"); // 期待更新箇所
+    courseEnrollment.setDeleted(false);
+
+    sut.updateCourseEnrollment(courseEnrollment);
+
+    CourseEnrollment actual = sut.searchCourseEnrollment("3");
+
+    assertThat(actual.getEnrollment()).isEqualTo("受講中");
+  }
+
+  @Test
+  void 受講生コース情報IDを設定せずにコース申込状況更新を行った時に更新が行われないこと() {
+    CourseEnrollment courseEnrollment = new CourseEnrollment();
+    courseEnrollment.setEnrollment("受講中"); // 期待更新箇所
+    courseEnrollment.setDeleted(false);
+
+    sut.updateCourseEnrollment(courseEnrollment);
+
+    CourseEnrollment actual = sut.searchCourseEnrollment("3");
+
+    assertThat(actual.getEnrollment()).isEqualTo("仮申込");
   }
 
 }

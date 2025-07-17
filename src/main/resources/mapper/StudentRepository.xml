@@ -45,6 +45,7 @@
 
   <!-- 受講生詳細情報パラメーターを元にした受講生詳細情報を検索 -->
   <resultMap id="StudentDetailResultMap" type="raisetech.StudentManagement.domain.StudentDetail">
+    <id property="student.id" column="s_id"/>
     <association property="student" javaType="raisetech.StudentManagement.data.Student">
       <id property="id" column="s_id"/>
       <result property="name" column="name"/>
