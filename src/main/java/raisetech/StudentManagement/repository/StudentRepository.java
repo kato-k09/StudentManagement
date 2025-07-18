@@ -68,9 +68,9 @@ public interface StudentRepository {
    * @param maxAge              最大年齢を指定する検索パラメータです。
    * @param startAtBefore       受講開始日がこの値より前を対象とした検索パラメータです。
    * @param endAtAfter          受講終了予定日がこの値より後を対象とした検索パラメータです。
-   * @return パラメータ検索に該当した受講生詳細リスト
+   * @return パラメータ検索に該当した受講生ID
    */
-  List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
+  List<String> searchParamsStudentIds(StudentDetail studentDetailParams, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter);
 
   /**

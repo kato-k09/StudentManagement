@@ -96,7 +96,8 @@ class StudentServiceTest {
         courseName, enrollment);
     sut.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter);
 
-    verify(repository, times(1)).searchParams(studentDetailParams, minAge, maxAge, startAtBefore,
+    verify(repository, times(1)).searchParamsStudentIds(studentDetailParams, minAge, maxAge,
+        startAtBefore,
         endAtAfter);
   }
 

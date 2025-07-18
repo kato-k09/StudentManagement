@@ -115,14 +115,14 @@ class StudentRepositoryTest {
 
   @ParameterizedTest
   @MethodSource("provideSearchParams")
-  void 受講生パラーメーター検索が行えること(int testIndex, Integer minAge,
+  void 受講生パラメーター検索による受講生ID取得が行えること(int testIndex, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter,
       String name, String courseName, String enrollment) {
 
     StudentDetail studentDetailParams = getStudentDetailParams(name,
         courseName, enrollment);
 
-    List<StudentDetail> actual = sut.searchParams(studentDetailParams, minAge, maxAge,
+    List<String> actual = sut.searchParamsStudentIds(studentDetailParams, minAge, maxAge,
         startAtBefore, endAtAfter);
 
     switch (testIndex) {
@@ -131,15 +131,9 @@ class StudentRepositoryTest {
       case 3 -> assertThat(actual.size()).isEqualTo(3);
       case 4 -> assertThat(actual.size()).isEqualTo(5);
       case 5 -> assertThat(actual.size()).isEqualTo(5);
-      case 6 -> assertThat(actual.get(0).getStudent().getName()).isEqualTo("野村佳奈多");
-      case 7 -> {
-        assertThat(actual.get(0).getStudent().getName()).isEqualTo("佐藤泰");
-        assertThat(actual.get(1).getStudent().getName()).isEqualTo("田中啓二");
-      }
-      case 8 -> {
-        assertThat(actual.get(0).getStudent().getName()).isEqualTo("田中啓二");
-        assertThat(actual.get(1).getStudent().getName()).isEqualTo("後藤桜");
-      }
+      case 6 -> assertThat(actual.size()).isEqualTo(1);
+      case 7 -> assertThat(actual.size()).isEqualTo(2);
+      case 8 -> assertThat(actual.size()).isEqualTo(2);
     }
   }
 
