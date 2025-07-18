@@ -70,7 +70,7 @@ public interface StudentRepository {
    * @param endAtAfter          受講終了予定日がこの値より後を対象とした検索パラメータです。
    * @return パラメータ検索に該当した受講生ID
    */
-  List<String> searchParamsStudentIds(StudentDetail studentDetailParams, Integer minAge,
+  List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter);
 
   /**

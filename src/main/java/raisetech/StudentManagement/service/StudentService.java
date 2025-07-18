@@ -77,15 +77,8 @@ public class StudentService {
   public List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter) {
 
-    List<String> studentIdList = repository.searchParamsStudentIds(studentDetailParams, minAge,
-        maxAge,
-        startAtBefore, endAtAfter);
-
-    List<StudentDetail> studentDetailList = new ArrayList<>();
-    for (String studentId : studentIdList) {
-      studentDetailList.add(searchStudent(studentId));
-    }
-    return studentDetailList;
+    return repository.searchParams(studentDetailParams, minAge,
+        maxAge, startAtBefore, endAtAfter);
   }
 
   /**

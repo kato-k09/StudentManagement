@@ -42,14 +42,31 @@ public class StudentController {
   }
 
   /**
-   * 受講生詳細の一覧検索です。 全件検索を行うので、条件指定は行いません。
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラーメーターを指定しなければ受講生詳細情報を全件取得します。
    *
-   * @return 受講生詳細一覧（全件）
+   * @param studentParams          Student内のフィールド名と一致しているパラメータを格納します。
+   * @param studentCourseParams    StudentCourse内のフィールド名と一致しているパラメータを格納します。
+   * @param courseEnrollmentParams CourseEnrollment内のフィールド名と一致しているパラメータを格納します。
+   * @param minAge                 最小年齢を指定する検索パラメータです。
+   * @param maxAge                 最大年齢を指定する検索パラメータです。
+   * @param startAtBefore          受講開始日がこの値より前を対象とした検索パラメータです。
+   * @param endAtAfter             受講終了予定日がこの値より後を対象とした検索パラメータです。
+   * @return パラメータ検索に該当した受講生詳細リスト
    */
-  @Operation(summary = "一覧検索", description = "受講生の一覧を検索し、Json形式で結果を取得します。")
   @GetMapping("/studentList")
-  public ResponseEntity<List<StudentDetail>> getStudentList() {
-    return ResponseEntity.ok(service.searchStudentList());
+  public ResponseEntity<List<StudentDetail>> searchParams(@ModelAttribute Student studentParams,
+      @ModelAttribute StudentCourse studentCourseParams,
+      @ModelAttribute CourseEnrollment courseEnrollmentParams,
+      @RequestParam(name = "minAge", required = false) Integer minAge,
+      @RequestParam(name = "maxAge", required = false) Integer maxAge,
+      @RequestParam(name = "startAtBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startAtBefore,
+      @RequestParam(name = "endAtAfter", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endAtAfter) {
+
+    StudentDetail studentDetailParams = new StudentDetail(studentParams,
+        List.of(studentCourseParams), List.of(courseEnrollmentParams));
+
+    return ResponseEntity.ok(
+        service.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter));
   }
 
   /**
@@ -67,34 +84,6 @@ public class StudentController {
       return ResponseEntity.ok(new StudentDetail());
     }
     return ResponseEntity.ok(responseStudentDetail);
-  }
-
-  /**
-   * 受講生パラメータ検索です。
-   *
-   * @param studentParams          Student内のフィールド名と一致しているパラメータを格納します。
-   * @param studentCourseParams    StudentCourse内のフィールド名と一致しているパラメータを格納します。
-   * @param courseEnrollmentParams CourseEnrollment内のフィールド名と一致しているパラメータを格納します。
-   * @param minAge                 最小年齢を指定する検索パラメータです。
-   * @param maxAge                 最大年齢を指定する検索パラメータです。
-   * @param startAtBefore          受講開始日がこの値より前を対象とした検索パラメータです。
-   * @param endAtAfter             受講終了予定日がこの値より後を対象とした検索パラメータです。
-   * @return パラメータ検索に該当した受講生詳細リスト
-   */
-  @GetMapping("/searchParams")
-  public ResponseEntity<List<StudentDetail>> searchParams(@ModelAttribute Student studentParams,
-      @ModelAttribute StudentCourse studentCourseParams,
-      @ModelAttribute CourseEnrollment courseEnrollmentParams,
-      @RequestParam(name = "minAge", required = false) Integer minAge,
-      @RequestParam(name = "maxAge", required = false) Integer maxAge,
-      @RequestParam(name = "startAtBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startAtBefore,
-      @RequestParam(name = "endAtAfter", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endAtAfter) {
-
-    StudentDetail studentDetailParams = new StudentDetail(studentParams,
-        List.of(studentCourseParams), List.of(courseEnrollmentParams));
-
-    return ResponseEntity.ok(
-        service.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter));
   }
 
   /**
