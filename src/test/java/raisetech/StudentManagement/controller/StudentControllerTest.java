@@ -40,11 +40,47 @@ public class StudentControllerTest {
   private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
   @Test
-  void 受講生詳細の一覧検索が実行できて空のリストが返ってくること() throws Exception {
+  void 受講生パラメーター検索が実行できて空のリストが返ってくること() throws Exception {
+    mockMvc.perform(get("/studentList")
+            .param("student.name", "佐藤")
+            .param("studentCourse.courseName", "Java")
+            .param("courseEnrollment.enrollment", "受講中")
+            .param("minAge", "20")
+            .param("maxAge", "30")
+            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString())
+            .param("endAtAfter", LocalDateTime.of(2025, 10, 1, 0, 0).toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    verify(service, times(1))
+        .searchParams(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void 受講生パラメーター検索が一部パラメーターの指定が無くても実行できて空のリストが返ってくること()
+      throws Exception {
+    mockMvc.perform(get("/studentList")
+            .param("student.name", "佐藤")
+            .param("studentCourse.courseName", "Java")
+            .param("courseEnrollment.enrollment", "受講中")
+            .param("minAge", "20")
+            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString()))
+        .andExpect(status().isOk())
+        .andExpect(content().json("[]"));
+
+    verify(service, times(1))
+        .searchParams(any(), any(), any(), any(), any());
+  }
+
+  @Test
+  void 受講生パラメーター検索がパラメーターの指定が無くても実行できて空のリストが返ってくること()
+      throws Exception {
     mockMvc.perform(get("/studentList"))
         .andExpect(status().isOk())
         .andExpect(content().json("[]"));
-    verify(service, times(1)).searchStudentList();
+
+    verify(service, times(1))
+        .searchParams(any(), any(), any(), any(), any());
   }
 
   @Test
@@ -101,39 +137,6 @@ public class StudentControllerTest {
     Set<ConstraintViolation<StudentCourse>> violations = validator.validate(studentCourse);
 
     assertThat(violations.size()).isEqualTo(0);
-  }
-
-  @Test
-  void 受講生パラメーター検索が実行できて空のリストが返ってくること() throws Exception {
-    mockMvc.perform(get("/searchParams")
-            .param("student.name", "佐藤")
-            .param("studentCourse.courseName", "Java")
-            .param("courseEnrollment.enrollment", "受講中")
-            .param("minAge", "20")
-            .param("maxAge", "30")
-            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString())
-            .param("endAtAfter", LocalDateTime.of(2025, 10, 1, 0, 0).toString()))
-        .andExpect(status().isOk())
-        .andExpect(content().json("[]"));
-
-    verify(service, times(1))
-        .searchParams(any(), any(), any(), any(), any());
-  }
-
-  @Test
-  void 受講生パラメーター検索が一部パラメーターの指定が無くても実行できて空のリストが返ってくること()
-      throws Exception {
-    mockMvc.perform(get("/searchParams")
-            .param("student.name", "佐藤")
-            .param("studentCourse.courseName", "Java")
-            .param("courseEnrollment.enrollment", "受講中")
-            .param("minAge", "20")
-            .param("startAtBefore", LocalDateTime.of(2025, 5, 1, 0, 0).toString()))
-        .andExpect(status().isOk())
-        .andExpect(content().json("[]"));
-
-    verify(service, times(1))
-        .searchParams(any(), any(), any(), any(), any());
   }
 
   @Test

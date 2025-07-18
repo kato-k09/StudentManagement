@@ -122,7 +122,7 @@ class StudentRepositoryTest {
     StudentDetail studentDetailParams = getStudentDetailParams(name,
         courseName, enrollment);
 
-    List<String> actual = sut.searchParams(studentDetailParams, minAge, maxAge,
+    List<StudentDetail> actual = sut.searchParams(studentDetailParams, minAge, maxAge,
         startAtBefore, endAtAfter);
 
     switch (testIndex) {

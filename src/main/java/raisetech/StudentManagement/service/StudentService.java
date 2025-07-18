@@ -65,7 +65,7 @@ public class StudentService {
   }
 
   /**
-   * 受講生パラメータ検索です。
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラーメーターを指定しなければ受講生詳細情報を全件取得します。
    *
    * @param studentDetailParams StudentDetail内のフィールド名と同一の検索パラメータを指定できます。
    * @param minAge              最小年齢を指定する検索パラメータです。
