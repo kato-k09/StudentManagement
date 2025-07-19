@@ -26,6 +26,7 @@ import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 import raisetech.StudentManagement.repository.StudentRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -82,23 +83,24 @@ class StudentServiceTest {
 
     verify(repository, times(1)).searchStudent(id);
     verify(repository, times(1)).searchStudentCourse(student.getId());
-    verify(repository, times(1)).searchCourseEnrollment("998");
+    verify(repository, times(1)).searchCourseEnrollment(studentCourse.getId());
     assertEquals(expected.getStudent().getId(), actual.getStudent().getId());
   }
 
   @ParameterizedTest
   @MethodSource("provideSearchParams")
-  void 受講生パラーメーター検索_リポジトリの処理が適切に呼び出せていること(Integer minAge,
+  void 受講生パラメーター検索_リポジトリの処理が適切に呼び出せていること(Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter,
       String name, String courseName, String enrollment) {
 
     StudentDetail studentDetailParams = getStudentDetailParams(name,
         courseName, enrollment);
-    sut.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter);
+    StudentSearchParamsExtra studentSearchParamsExtra = new StudentSearchParamsExtra(minAge, maxAge,
+        startAtBefore, endAtAfter);
 
-    verify(repository, times(1)).searchParams(studentDetailParams, minAge, maxAge,
-        startAtBefore,
-        endAtAfter);
+    sut.searchParams(studentDetailParams, studentSearchParamsExtra);
+
+    verify(repository, times(1)).searchParams(studentDetailParams, studentSearchParamsExtra);
   }
 
   static Stream<Arguments> provideSearchParams() {

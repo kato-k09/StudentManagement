@@ -4,10 +4,8 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -18,12 +16,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 import raisetech.StudentManagement.exception.TestException;
 import raisetech.StudentManagement.service.StudentService;
 
@@ -42,31 +40,25 @@ public class StudentController {
   }
 
   /**
-   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラーメーターを指定しなければ受講生詳細情報を全件取得します。
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラメーターを指定しなければ受講生詳細情報を全件取得します。
    *
-   * @param studentParams          Student内のフィールド名と一致しているパラメータを格納します。
-   * @param studentCourseParams    StudentCourse内のフィールド名と一致しているパラメータを格納します。
-   * @param courseEnrollmentParams CourseEnrollment内のフィールド名と一致しているパラメータを格納します。
-   * @param minAge                 最小年齢を指定する検索パラメータです。
-   * @param maxAge                 最大年齢を指定する検索パラメータです。
-   * @param startAtBefore          受講開始日がこの値より前を対象とした検索パラメータです。
-   * @param endAtAfter             受講終了予定日がこの値より後を対象とした検索パラメータです。
+   * @param studentParams            Student内のフィールド名と一致しているパラメータを格納します。
+   * @param studentCourseParams      StudentCourse内のフィールド名と一致しているパラメータを格納します。
+   * @param courseEnrollmentParams   CourseEnrollment内のフィールド名と一致しているパラメータを格納します。
+   * @param studentSearchParamsExtra 拡張検索パラメータです。StudentSearchParamsExtraクラス内で定義されたパラメーターを格納します。
    * @return パラメータ検索に該当した受講生詳細リスト
    */
   @GetMapping("/studentList")
   public ResponseEntity<List<StudentDetail>> searchParams(@ModelAttribute Student studentParams,
       @ModelAttribute StudentCourse studentCourseParams,
       @ModelAttribute CourseEnrollment courseEnrollmentParams,
-      @RequestParam(name = "minAge", required = false) Integer minAge,
-      @RequestParam(name = "maxAge", required = false) Integer maxAge,
-      @RequestParam(name = "startAtBefore", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startAtBefore,
-      @RequestParam(name = "endAtAfter", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endAtAfter) {
+      @ModelAttribute StudentSearchParamsExtra studentSearchParamsExtra) {
 
     StudentDetail studentDetailParams = new StudentDetail(studentParams,
         List.of(studentCourseParams), List.of(courseEnrollmentParams));
 
     return ResponseEntity.ok(
-        service.searchParams(studentDetailParams, minAge, maxAge, startAtBefore, endAtAfter));
+        service.searchParams(studentDetailParams, studentSearchParamsExtra));
   }
 
   /**

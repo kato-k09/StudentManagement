@@ -18,6 +18,7 @@ import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 
 @MybatisTest
 class StudentRepositoryTest {
@@ -115,15 +116,17 @@ class StudentRepositoryTest {
 
   @ParameterizedTest
   @MethodSource("provideSearchParams")
-  void 受講生パラメーター検索による受講生ID取得が行えること(int testIndex, Integer minAge,
+  void 受講生パラメーター検索による受講生詳細情報取得が行えること(int testIndex, Integer minAge,
       Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter,
       String name, String courseName, String enrollment) {
 
     StudentDetail studentDetailParams = getStudentDetailParams(name,
         courseName, enrollment);
-
-    List<StudentDetail> actual = sut.searchParams(studentDetailParams, minAge, maxAge,
+    StudentSearchParamsExtra studentSearchParamsExtra = new StudentSearchParamsExtra(minAge, maxAge,
         startAtBefore, endAtAfter);
+
+    List<StudentDetail> actual = sut.searchParams(studentDetailParams, studentSearchParamsExtra
+    );
 
     switch (testIndex) {
       case 1 -> assertThat(actual.size()).isEqualTo(0);

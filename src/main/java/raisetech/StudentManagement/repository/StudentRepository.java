@@ -1,12 +1,12 @@
 package raisetech.StudentManagement.repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import org.apache.ibatis.annotations.Mapper;
 import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 
 /**
  * 受講生テーブルと受講生コース情報テーブルと紐づくRepositoryです。
@@ -61,17 +61,14 @@ public interface StudentRepository {
   CourseEnrollment searchCourseEnrollment(String courseId);
 
   /**
-   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラーメーターを指定しなければ受講生詳細情報を全件取得します。
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラメーターを指定しなければ受講生詳細情報を全件取得します。
    *
-   * @param studentDetailParams StudentDetail内のフィールド名と同一の検索パラメータを指定できます。
-   * @param minAge              最小年齢を指定する検索パラメータです。
-   * @param maxAge              最大年齢を指定する検索パラメータです。
-   * @param startAtBefore       受講開始日がこの値より前を対象とした検索パラメータです。
-   * @param endAtAfter          受講終了予定日がこの値より後を対象とした検索パラメータです。
+   * @param studentDetailParams      StudentDetail内のフィールド名と同一の検索パラメータを指定できます。
+   * @param studentSearchParamsExtra 拡張検索パラメータです。StudentSearchParamsExtraクラス内で定義されたパラメーターです。
    * @return パラメータ検索に該当した受講生ID
    */
-  List<StudentDetail> searchParams(StudentDetail studentDetailParams, Integer minAge,
-      Integer maxAge, LocalDateTime startAtBefore, LocalDateTime endAtAfter);
+  List<StudentDetail> searchParams(StudentDetail studentDetailParams,
+      StudentSearchParamsExtra studentSearchParamsExtra);
 
   /**
    * 受講生情報を新規登録します。IDに関しては自動採番を行う。

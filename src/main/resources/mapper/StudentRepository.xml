@@ -161,18 +161,18 @@
         AND ce.enrollment = #{studentDetailParams.courseEnrollmentList[0].enrollment}
       </if>
 
-      <if test="minAge != null and minAge != ''">
-        AND s.age &gt;= #{minAge}
+      <if test="studentSearchParamsExtra.minAge != null and studentSearchParamsExtra.minAge != ''">
+        AND s.age &gt;= #{studentSearchParamsExtra.minAge}
       </if>
-      <if test="maxAge != null and maxAge != ''">
-        AND s.age &lt;= #{maxAge}
+      <if test="studentSearchParamsExtra.maxAge != null and studentSearchParamsExtra.maxAge != ''">
+        AND s.age &lt;= #{studentSearchParamsExtra.maxAge}
       </if>
 
-      <if test="startAtBefore != null">
-        AND sc.course_start_at &lt;= #{startAtBefore}
+      <if test="studentSearchParamsExtra.startAtBefore != null">
+        AND sc.course_start_at &lt;= #{studentSearchParamsExtra.startAtBefore}
       </if>
-      <if test="endAtAfter != null">
-        AND sc.course_end_at &gt;= #{endAtAfter}
+      <if test="studentSearchParamsExtra.endAtAfter != null">
+        AND sc.course_end_at &gt;= #{studentSearchParamsExtra.endAtAfter}
       </if>
     </where>
   </select>

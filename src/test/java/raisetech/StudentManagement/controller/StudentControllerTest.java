@@ -53,7 +53,7 @@ public class StudentControllerTest {
         .andExpect(content().json("[]"));
 
     verify(service, times(1))
-        .searchParams(any(), any(), any(), any(), any());
+        .searchParams(any(), any());
   }
 
   @Test
@@ -69,7 +69,7 @@ public class StudentControllerTest {
         .andExpect(content().json("[]"));
 
     verify(service, times(1))
-        .searchParams(any(), any(), any(), any(), any());
+        .searchParams(any(), any());
   }
 
   @Test
@@ -80,7 +80,7 @@ public class StudentControllerTest {
         .andExpect(content().json("[]"));
 
     verify(service, times(1))
-        .searchParams(any(), any(), any(), any(), any());
+        .searchParams(any(), any());
   }
 
   @Test
