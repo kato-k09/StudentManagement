@@ -21,3 +21,11 @@ CREATE TABLE IF NOT EXISTS students_courses
     course_end_at   TIMESTAMP,
     is_deleted      boolean
 );
+
+CREATE TABLE IF NOT EXISTS courses_enrollments
+(
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    course_id INT NOT NULL,
+    enrollment ENUM('仮申込', '本申込', '受講中', '受講終了'),
+    is_deleted boolean
+);

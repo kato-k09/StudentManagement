@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 
@@ -24,5 +25,9 @@ public class StudentDetail {
   @Schema(description = "受講生コース情報オブジェクトです。")
   @Valid
   private List<StudentCourse> studentCourseList;
+
+  @Schema(description = "コース申込状況オブジェクトです。")
+  @Valid
+  private List<CourseEnrollment> courseEnrollmentList;
 
 }

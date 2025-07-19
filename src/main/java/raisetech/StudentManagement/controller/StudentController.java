@@ -6,15 +6,22 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import raisetech.StudentManagement.data.CourseEnrollment;
+import raisetech.StudentManagement.data.Student;
+import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 import raisetech.StudentManagement.exception.TestException;
 import raisetech.StudentManagement.service.StudentService;
 
@@ -33,14 +40,25 @@ public class StudentController {
   }
 
   /**
-   * 受講生詳細の一覧検索です。 全件検索を行うので、条件指定は行いません。
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラメーターを指定しなければ受講生詳細情報を全件取得します。
    *
-   * @return 受講生詳細一覧（全件）
+   * @param studentParams            Student内のフィールド名と一致しているパラメータを格納します。
+   * @param studentCourseParams      StudentCourse内のフィールド名と一致しているパラメータを格納します。
+   * @param courseEnrollmentParams   CourseEnrollment内のフィールド名と一致しているパラメータを格納します。
+   * @param studentSearchParamsExtra 拡張検索パラメータです。StudentSearchParamsExtraクラス内で定義されたパラメーターを格納します。
+   * @return パラメータ検索に該当した受講生詳細リスト
    */
-  @Operation(summary = "一覧検索", description = "受講生の一覧を検索し、Json形式で結果を取得します。")
   @GetMapping("/studentList")
-  public List<StudentDetail> getStudentList() {
-    return service.searchStudentList();
+  public ResponseEntity<List<StudentDetail>> searchParams(@ModelAttribute Student studentParams,
+      @ModelAttribute StudentCourse studentCourseParams,
+      @ModelAttribute CourseEnrollment courseEnrollmentParams,
+      @ModelAttribute StudentSearchParamsExtra studentSearchParamsExtra) {
+
+    StudentDetail studentDetailParams = new StudentDetail(studentParams,
+        List.of(studentCourseParams), List.of(courseEnrollmentParams));
+
+    return ResponseEntity.ok(
+        service.searchParams(studentDetailParams, studentSearchParamsExtra));
   }
 
   /**
@@ -51,8 +69,13 @@ public class StudentController {
    */
   @Operation(summary = "受講生検索", description = "idに紐づいた受講生を検索し、Json形式で結果を取得します。")
   @GetMapping("/student/{id}")
-  public StudentDetail getStudent(@PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
-    return service.searchStudent(id);
+  public ResponseEntity<StudentDetail> getStudent(
+      @PathVariable @NotBlank @Pattern(regexp = "^\\d+$") String id) {
+    StudentDetail responseStudentDetail = service.searchStudent(id);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail());
+    }
+    return ResponseEntity.ok(responseStudentDetail);
   }
 
   /**
@@ -66,6 +89,24 @@ public class StudentController {
   public ResponseEntity<StudentDetail> registerStudent(
       @Valid @RequestBody StudentDetail studentDetail) {
     StudentDetail responseStudentDetail = service.registerStudent(studentDetail);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail());
+    }
+    return ResponseEntity.ok(responseStudentDetail);
+  }
+
+  /**
+   * 受講生IDに紐づけてコースを追加します。
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
+  @PostMapping("/addCourse")
+  public ResponseEntity<StudentDetail> addCourse(@Valid @RequestBody StudentDetail studentDetail) {
+    StudentDetail responseStudentDetail = service.addCourse(studentDetail);
+    if (responseStudentDetail == null) {
+      return ResponseEntity.ok(new StudentDetail());
+    }
     return ResponseEntity.ok(responseStudentDetail);
   }
 
@@ -86,5 +127,10 @@ public class StudentController {
   @GetMapping("/exception")
   public ResponseEntity<String> exception() throws TestException {
     throw new TestException("このAPIは現在利用できません。古いURLとなっています。");
+  }
+
+  @ExceptionHandler(RuntimeException.class)
+  public ResponseEntity<String> handleRuntimeException(RuntimeException ex) {
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
   }
 }

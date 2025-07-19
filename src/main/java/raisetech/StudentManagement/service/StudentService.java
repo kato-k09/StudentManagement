@@ -1,14 +1,17 @@
 package raisetech.StudentManagement.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import raisetech.StudentManagement.controller.converter.StudentConverter;
+import raisetech.StudentManagement.converter.StudentConverter;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
+import raisetech.StudentManagement.dto.StudentSearchParamsExtra;
 import raisetech.StudentManagement.repository.StudentRepository;
 
 /**
@@ -33,8 +36,12 @@ public class StudentService {
    */
   public List<StudentDetail> searchStudentList() {
     List<Student> studentList = repository.search();
+    if (studentList == null) {
+      throw new RuntimeException("登録されている受講生が存在しません。");
+    }
     List<StudentCourse> studentCourseList = repository.searchStudentCourseList();
-    return converter.convertStudentDetails(studentList, studentCourseList);
+    List<CourseEnrollment> courseEnrollmentList = repository.searchCourseEnrollmentList();
+    return converter.convertStudentDetails(studentList, studentCourseList, courseEnrollmentList);
   }
 
   /**
@@ -45,8 +52,30 @@ public class StudentService {
    */
   public StudentDetail searchStudent(String id) {
     Student student = repository.searchStudent(id);
-    List<StudentCourse> studentCourse = repository.searchStudentCourse(student.getId());
-    return new StudentDetail(student, studentCourse);
+    if (student == null) {
+      throw new RuntimeException("指定された受講生が見つかりません: ID = " + id);
+    }
+    List<StudentCourse> studentCourseList = repository.searchStudentCourse(student.getId());
+
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentCourseList) {
+      courseEnrollmentList.add(repository.searchCourseEnrollment(studentCourse.getId()));
+    }
+
+    return new StudentDetail(student, studentCourseList, courseEnrollmentList);
+  }
+
+  /**
+   * 受講生詳細の一覧検索 兼 受講生パラメータ検索です。パラメーターを指定しなければ受講生詳細情報を全件取得します。
+   *
+   * @param studentDetailParams      StudentDetail内のフィールド名と同一の検索パラメーターを指定できます。
+   * @param studentSearchParamsExtra 拡張検索パラメータです。StudentSearchParamsExtraクラス内で定義されたパラメーターです。
+   * @return パラメータ検索に該当した受講生詳細リスト
+   */
+  public List<StudentDetail> searchParams(StudentDetail studentDetailParams,
+      StudentSearchParamsExtra studentSearchParamsExtra) {
+
+    return repository.searchParams(studentDetailParams, studentSearchParamsExtra);
   }
 
   /**
@@ -60,10 +89,21 @@ public class StudentService {
     Student student = studentDetail.getStudent();
 
     repository.registerStudent(student);
-    studentDetail.getStudentCourseList().forEach(studentCourses -> {
-      initStudentsCourse(studentCourses, student.getId());
-      repository.registerStudentCourse(studentCourses);
+    studentDetail.getStudentCourseList().forEach(studentCourse -> {
+      initStudentsCourse(studentCourse, student.getId());
+      repository.registerStudentCourse(studentCourse);
     });
+
+    // 受講生コース情報を元にコース申込状況を生成・受講生コース情報ID・仮申込情報を設定
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentDetail.getStudentCourseList()) {
+      CourseEnrollment courseEnrollment = new CourseEnrollment();
+      courseEnrollment.setCourseId(studentCourse.getId());
+      courseEnrollment.setEnrollment("仮申込");
+      repository.registerCourseEnrollment(courseEnrollment);
+      courseEnrollmentList.add(courseEnrollment);
+    }
+    studentDetail.setCourseEnrollmentList(courseEnrollmentList);
 
     return studentDetail;
   }
@@ -72,7 +112,7 @@ public class StudentService {
    * 受講生コース情報を登録する際の初期情報を設定する。
    *
    * @param studentCourses 受講生コース情報
-   * @param student        受講生
+   * @param id             受講生
    */
   void initStudentsCourse(StudentCourse studentCourses, String id) {
     LocalDateTime now = LocalDateTime.now();
@@ -80,6 +120,35 @@ public class StudentService {
     studentCourses.setStudentId(id);
     studentCourses.setCourseStartAt(now);
     studentCourses.setCourseEndAt(now.plusYears(1));
+  }
+
+  /**
+   * 受講生IDに紐づけてコースを追加します。
+   *
+   * @param studentDetail 受講生詳細
+   * @return 実行結果
+   */
+  @Transactional
+  public StudentDetail addCourse(StudentDetail studentDetail) {
+    Student student = studentDetail.getStudent();
+
+    studentDetail.getStudentCourseList().forEach(studentCourse -> {
+      initStudentsCourse(studentCourse, student.getId());
+      repository.registerStudentCourse(studentCourse);
+    });
+
+    // 受講生コース情報を元にコース申込状況を生成・受講生コース情報ID・仮申込情報を設定
+    List<CourseEnrollment> courseEnrollmentList = new ArrayList<>();
+    for (StudentCourse studentCourse : studentDetail.getStudentCourseList()) {
+      CourseEnrollment courseEnrollment = new CourseEnrollment();
+      courseEnrollment.setCourseId(studentCourse.getId());
+      courseEnrollment.setEnrollment("仮申込");
+      repository.registerCourseEnrollment(courseEnrollment);
+      courseEnrollmentList.add(courseEnrollment);
+    }
+    studentDetail.setCourseEnrollmentList(courseEnrollmentList);
+
+    return studentDetail;
   }
 
   /**
@@ -97,6 +166,13 @@ public class StudentService {
       }
       repository.updateStudentCourse(studentCourses);
     });
+
+    for (CourseEnrollment courseEnrollment : studentDetail.getCourseEnrollmentList()) {
+      if (studentDetail.getStudent().isDeleted()) {
+        courseEnrollment.setDeleted(true);
+      }
+      repository.updateCourseEnrollment(courseEnrollment);
+    }
   }
 
 }

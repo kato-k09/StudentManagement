@@ -43,7 +43,7 @@ public class Student {
   private String area;
 
   @Schema(description = "受講生の年齢です。1歳以上200歳以下の範囲で入力可能です。", example = "30")
-  @Min(value = 1, message = "年齢を入力してください。")
+  @Min(value = 0, message = "年齢を入力してください。")
   @Max(value = 200, message = "正しい年齢を入力してください。")
   private int age;
 

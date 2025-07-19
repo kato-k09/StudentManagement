@@ -1,9 +1,10 @@
-package raisetech.StudentManagement.controller.converter;
+package raisetech.StudentManagement.converter;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Component;
+import raisetech.StudentManagement.data.CourseEnrollment;
 import raisetech.StudentManagement.data.Student;
 import raisetech.StudentManagement.data.StudentCourse;
 import raisetech.StudentManagement.domain.StudentDetail;
@@ -22,7 +23,7 @@ public class StudentConverter {
    * @return 受講生詳細情報のリスト
    */
   public List<StudentDetail> convertStudentDetails(List<Student> studentList,
-      List<StudentCourse> studentCourseList) {
+      List<StudentCourse> studentCourseList, List<CourseEnrollment> courseEnrollmentList) {
     List<StudentDetail> studentDetails = new ArrayList<>();
     studentList.forEach(student -> {
       StudentDetail studentDetail = new StudentDetail();
@@ -32,8 +33,19 @@ public class StudentConverter {
           .filter(studentCourse -> student.getId().equals(studentCourse.getStudentId()))
           .collect(Collectors.toList());
       studentDetail.setStudentCourseList(convertStudentCourseList);
+
+      List<CourseEnrollment> convertCourseEnrollmentList = new ArrayList<>();
+      for (StudentCourse studentCourse : convertStudentCourseList) {
+        convertCourseEnrollmentList.addAll(courseEnrollmentList.stream()
+            .filter(
+                courseEnrollment -> courseEnrollment.getCourseId().equals(studentCourse.getId()))
+            .collect(Collectors.toList()));
+      }
+      studentDetail.setCourseEnrollmentList(convertCourseEnrollmentList);
+
       studentDetails.add(studentDetail);
     });
+
     return studentDetails;
   }
 }
